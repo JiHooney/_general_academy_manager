@@ -16,6 +16,8 @@ export class CreateBookingRequestDto {
   @ApiProperty() @IsDateString() startAt: string;
   @ApiProperty() @IsDateString() endAt: string;
   @ApiPropertyOptional() @IsString() @IsOptional() message?: string;
+  @ApiPropertyOptional() @IsString() @IsOptional() requestType?: string; // new|reschedule|cancel
+  @ApiPropertyOptional() @IsUUID() @IsOptional() appointmentId?: string;
 }
 
 export class UpdateBookingRequestDto {
@@ -33,7 +35,7 @@ export class RequestsService {
   ) {}
 
   async create(classroomId: string, dto: CreateBookingRequestDto, studentId: string) {
-    const request = await this.prisma.bookingRequest.create({
+    const request = await (this.prisma.bookingRequest as any).create({
       data: {
         classroomId,
         studentId,
@@ -42,6 +44,8 @@ export class RequestsService {
         endAt: new Date(dto.endAt),
         message: dto.message,
         status: 'pending',
+        requestType: dto.requestType ?? 'new',
+        appointmentId: dto.appointmentId,
       },
     });
 
@@ -95,6 +99,29 @@ export class RequestsService {
 
     // Conflict check in transaction
     return this.prisma.$transaction(async (tx) => {
+      // 취소 요청인 경우: 기존 수업만 취소
+      if ((req as any).requestType === 'cancel' && (req as any).appointmentId) {
+        await tx.appointment.update({
+          where: { id: (req as any).appointmentId },
+          data: { status: 'canceled' },
+        });
+        const updatedReq = await tx.bookingRequest.update({
+          where: { id: requestId },
+          data: { status: 'accepted', respondedAt: new Date() },
+        });
+        await this.notifications.create(req.studentId, 'booking_accepted', { requestId });
+        return { request: updatedReq, appointment: null };
+      }
+
+      // 수정 요청인 경우: 기존 수업 취소 + 새 수업 생성
+      if ((req as any).requestType === 'reschedule' && (req as any).appointmentId) {
+        await tx.appointment.update({
+          where: { id: (req as any).appointmentId },
+          data: { status: 'rescheduled' },
+        });
+      }
+
+      // 신규/수정: 충돌 체크
       const conflict = await tx.appointment.findFirst({
         where: {
           teacherId,

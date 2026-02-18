@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength, MaxLength } from 'class-validator';
+import { IsEmail, IsString, MinLength, MaxLength, IsOptional, IsIn } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class SignupDto {
@@ -19,12 +19,19 @@ export class SignupDto {
   name: string;
 
   @ApiProperty({ example: 'Asia/Seoul', required: false })
+  @IsOptional()
   @IsString()
   timezone?: string = 'UTC';
 
   @ApiProperty({ example: 'ko', required: false, enum: ['ko', 'en', 'ja', 'zh-Hant', 'zh-Hans', 'fr'] })
+  @IsOptional()
   @IsString()
   locale?: string = 'en';
+
+  @ApiProperty({ example: 'student', required: false, enum: ['student', 'teacher'] })
+  @IsOptional()
+  @IsIn(['student', 'teacher'])
+  role?: 'student' | 'teacher' = 'student';
 }
 
 export class LoginDto {

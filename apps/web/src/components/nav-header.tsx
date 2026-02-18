@@ -108,15 +108,32 @@ export function NavHeader({ locale, title, showBack, backHref, role }: NavHeader
               🔑 스튜디오 참가
             </Link>
 
+            <Link
+              href={`/${locale}/schedule`}
+              onClick={() => setMenuOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700"
+            >
+              📅 내 일정
+            </Link>
+
             {/* 선생님 전용 */}
             {role === 'teacher' || role === 'admin' ? (
-              <Link
-                href={`/${locale}/requests`}
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-sm text-amber-600 font-medium"
-              >
-                📋 수업 요청 관리
-              </Link>
+              <>
+                <Link
+                  href={`/${locale}/organizations/create`}
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-sm text-amber-600 font-medium"
+                >
+                  🏢 조직 생성
+                </Link>
+                <Link
+                  href={`/${locale}/requests`}
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-sm text-amber-600 font-medium"
+                >
+                  📋 수업 요청 관리
+                </Link>
+              </>
             ) : null}
 
             <div className="border-t my-1" />

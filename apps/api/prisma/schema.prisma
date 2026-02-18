@@ -12,20 +12,30 @@ datasource db {
 
 // ─── Users ───────────────────────────────────────────────────────────────────
 
+enum UserRole {
+  student
+  teacher
+  admin
+}
+
 model User {
   id           String   @id @default(uuid())
   email        String   @unique
   passwordHash String   @map("password_hash")
   name         String
+  role         UserRole @default(student)
   timezone     String   @default("UTC")
   locale       String   @default("en")
+  trialEndsAt  DateTime? @map("trial_ends_at") @db.Timestamptz
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
 
-  organizations       Organization[]
-  createdStudios      Studio[]           @relation("StudioCreator")
-  createdClassrooms   Classroom[]        @relation("ClassroomCreator")
-  memberships         ClassroomMembership[]
-  invitesCreated      InviteCode[]
+  organizations           Organization[]
+  createdStudios          Studio[]             @relation("StudioCreator")
+  createdClassrooms       Classroom[]          @relation("ClassroomCreator")
+  memberships             ClassroomMembership[]
+  studioMemberships       StudioMembership[]
+  studioInvitesCreated    StudioInviteCode[]   @relation("StudioInviteCreator")
+  invitesCreated          InviteCode[]
   bookingRequestsAsStudent BookingRequest[] @relation("BookingStudent")
   bookingRequestsAsTeacher BookingRequest[] @relation("BookingTeacher")
   appointmentsAsTeacher Appointment[]     @relation("AppointmentTeacher")
@@ -60,11 +70,51 @@ model Studio {
   createdBy      String   @map("created_by")
   createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
 
-  organization Organization @relation(fields: [organizationId], references: [id])
-  creator      User         @relation("StudioCreator", fields: [createdBy], references: [id])
+  organization Organization     @relation(fields: [organizationId], references: [id])
+  creator      User              @relation("StudioCreator", fields: [createdBy], references: [id])
   classrooms   Classroom[]
+  memberships  StudioMembership[]
+  inviteCodes  StudioInviteCode[]
 
   @@map("studios")
+}
+
+// ─── Studio Memberships ───────────────────────────────────────────────────────
+
+model StudioMembership {
+  id        String   @id @default(uuid())
+  studioId  String   @map("studio_id")
+  userId    String   @map("user_id")
+  role      String   @default("student") // student | teacher
+  joinedAt  DateTime @default(now()) @map("joined_at") @db.Timestamptz
+
+  studio Studio @relation(fields: [studioId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([studioId, userId])
+  @@index([studioId])
+  @@index([userId])
+  @@map("studio_memberships")
+}
+
+// ─── Studio Invite Codes ──────────────────────────────────────────────────────
+
+model StudioInviteCode {
+  id        String    @id @default(uuid())
+  studioId  String    @map("studio_id")
+  code      String    @unique
+  expiresAt DateTime? @map("expires_at") @db.Timestamptz
+  maxUses   Int?      @map("max_uses")
+  usedCount Int       @default(0) @map("used_count")
+  isRevoked Boolean   @default(false) @map("is_revoked")
+  createdBy String    @map("created_by")
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  studio  Studio @relation(fields: [studioId], references: [id])
+  creator User   @relation("StudioInviteCreator", fields: [createdBy], references: [id])
+
+  @@index([code])
+  @@map("studio_invite_codes")
 }
 
 // ─── Classrooms ───────────────────────────────────────────────────────────────
@@ -140,12 +190,15 @@ model BookingRequest {
   endAt             DateTime  @map("end_at") @db.Timestamptz
   message           String?
   status            String    @default("pending") // pending|accepted|rejected|canceled|expired
+  requestType       String    @default("new") @map("request_type") // new|reschedule|cancel
+  appointmentId     String?   @map("appointment_id")
   createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz
   respondedAt       DateTime? @map("responded_at") @db.Timestamptz
 
   classroom        Classroom @relation(fields: [classroomId], references: [id])
   student          User      @relation("BookingStudent", fields: [studentId], references: [id])
   requestedTeacher User?     @relation("BookingTeacher", fields: [requestedTeacherId], references: [id])
+  appointment      Appointment? @relation("AppointmentChangeRequest", fields: [appointmentId], references: [id])
 
   @@index([classroomId, startAt])
   @@index([studentId])
@@ -169,6 +222,7 @@ model Appointment {
   classroom Classroom @relation(fields: [classroomId], references: [id])
   teacher   User      @relation("AppointmentTeacher", fields: [teacherId], references: [id])
   student   User      @relation("AppointmentStudent", fields: [studentId], references: [id])
+  changeRequests BookingRequest[] @relation("AppointmentChangeRequest")
 
   @@index([classroomId, startAt])
   @@index([teacherId, startAt, endAt])

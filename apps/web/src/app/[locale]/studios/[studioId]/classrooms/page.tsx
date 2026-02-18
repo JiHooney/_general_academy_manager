@@ -19,6 +19,27 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [timezone, setTimezone] = useState('UTC');
+  const [inviteCode, setInviteCode] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const { data: me } = useQuery({
+    queryKey: ['me'],
+    queryFn: () => api.get<{ role: string }>('/auth/me'),
+  });
+  const isTeacher = me?.role === 'teacher' || me?.role === 'admin';
+
+  const generateInviteMutation = useMutation({
+    mutationFn: () => api.post<{ code: string }>(`/studios/${studioId}/invites`, {}),
+    onSuccess: (data) => setInviteCode(data.code),
+  });
+
+  const copyCode = () => {
+    if (inviteCode) {
+      navigator.clipboard.writeText(inviteCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   const { data: classrooms = [], isLoading } = useQuery({
     queryKey: ['classrooms', studioId],
@@ -43,13 +64,40 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
       <main className="max-w-4xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{t('classroom.title')}</h1>
-        <button
-          onClick={() => setShowForm(true)}
-          className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition text-sm"
-        >
-          {t('classroom.create')}
-        </button>
+        <div className="flex items-center gap-2">
+          {isTeacher && (
+            <button
+              onClick={() => generateInviteMutation.mutate()}
+              disabled={generateInviteMutation.isPending}
+              className="border border-amber-500 text-amber-600 px-4 py-2 rounded-lg hover:bg-amber-50 transition text-sm font-medium"
+            >
+              🔑 초대코드 생성
+            </button>
+          )}
+          <button
+            onClick={() => setShowForm(true)}
+            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition text-sm"
+          >
+            {t('classroom.create')}
+          </button>
+        </div>
       </div>
+
+      {/* 초대코드 표시 배너 */}
+      {inviteCode && (
+        <div className="bg-amber-50 border border-amber-300 rounded-xl p-4 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-xs text-amber-600 font-semibold mb-1">📨 학생에게 이 코드를 공유하세요</p>
+            <p className="font-mono text-2xl font-bold text-amber-800 tracking-widest">{inviteCode}</p>
+          </div>
+          <button
+            onClick={copyCode}
+            className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition text-sm font-medium whitespace-nowrap"
+          >
+            {copied ? '✅ 복사됨' : '📋 복사'}
+          </button>
+        </div>
+      )}
 
       {showForm && (
         <div className="bg-white border rounded-xl p-6 space-y-4 shadow-sm">

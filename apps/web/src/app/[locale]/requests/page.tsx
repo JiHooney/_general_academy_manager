@@ -10,6 +10,8 @@ interface PendingRequest {
   endAt: string;
   message?: string;
   status: string;
+  requestType?: string;
+  appointment?: { id: string; startAt: string; endAt: string } | null;
   student: { id: string; name: string; email: string };
   classroom: { id: string; name: string };
 }
@@ -62,28 +64,42 @@ export default function PendingRequestsPage({ params: { locale } }: { params: { 
       )}
 
       <div className="space-y-4">
-        {requests.map((req) => (
+        {requests.map((req) => {
+          const typeLabel =
+            req.requestType === 'cancel' ? { label: '취소 요청', cls: 'bg-red-100 text-red-700' } :
+            req.requestType === 'reschedule' ? { label: '시간 변경 요청', cls: 'bg-blue-100 text-blue-700' } :
+            { label: '신규 수업 요청', cls: 'bg-yellow-100 text-yellow-700' };
+
+          return (
           <div key={req.id} className="bg-white border rounded-xl p-5 shadow-sm space-y-3">
             <div className="flex items-start justify-between">
               <div>
                 <p className="font-semibold text-gray-800">{req.classroom.name}</p>
                 <p className="text-sm text-gray-500">학생: {req.student.name} ({req.student.email})</p>
               </div>
-              <span className="bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded-full">요청중</span>
+              <span className={`text-xs px-2 py-1 rounded-full font-medium ${typeLabel.cls}`}>{typeLabel.label}</span>
             </div>
+
+            {req.appointment && req.requestType !== 'new' && (
+              <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-600 space-y-0.5">
+                <p className="font-semibold text-gray-700">현재 예약된 수업</p>
+                <p>시작: {fmt(req.appointment.startAt)}</p>
+                <p>종료: {fmt(req.appointment.endAt)}</p>
+              </div>
+            )}
 
             <div className="text-sm text-gray-700 space-y-1">
               <div className="flex gap-2">
-                <span className="font-medium w-16 shrink-0">시작</span>
+                <span className="font-medium w-20 shrink-0">{req.requestType === 'cancel' ? '취소할' : req.requestType === 'reschedule' ? '변경 후' : ''} 시작</span>
                 <span>{fmt(req.startAt)}</span>
               </div>
               <div className="flex gap-2">
-                <span className="font-medium w-16 shrink-0">종료</span>
+                <span className="font-medium w-20 shrink-0">종료</span>
                 <span>{fmt(req.endAt)}</span>
               </div>
               {req.message && (
                 <div className="flex gap-2">
-                  <span className="font-medium w-16 shrink-0">메시지</span>
+                  <span className="font-medium w-20 shrink-0">메시지</span>
                   <span className="text-gray-600 italic">"{req.message}"</span>
                 </div>
               )}
@@ -106,7 +122,8 @@ export default function PendingRequestsPage({ params: { locale } }: { params: { 
               </button>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </main>
     </>

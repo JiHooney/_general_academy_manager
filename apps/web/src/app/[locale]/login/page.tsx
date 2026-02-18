@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { api } from '../../../lib/api';
+import { LanguageSwitcher } from '../../../components/language-switcher';
 
 export default function LoginPage({ params: { locale } }: { params: { locale: string } }) {
   const t = useTranslations('auth');
@@ -28,9 +29,13 @@ export default function LoginPage({ params: { locale } }: { params: { locale: st
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-4">
+    <main className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-md p-8 space-y-6">
-        <h1 className="text-2xl font-bold text-center">{t('login')}</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">GAM</h1>
+          <LanguageSwitcher currentLocale={locale} />
+        </div>
+        <p className="text-gray-500 text-sm -mt-3">General Academic Manager</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

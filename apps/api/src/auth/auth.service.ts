@@ -31,6 +31,11 @@ export class AuthService {
     if (existing) throw new ConflictException('Email already in use');
 
     const passwordHash = await bcrypt.hash(dto.password, SALT_ROUNDS);
+    const isTeacher = dto.role === 'teacher';
+    const trialEndsAt = isTeacher
+      ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30일 무료 체험
+      : null;
+
     const user = await this.prisma.user.create({
       data: {
         email: dto.email,
@@ -38,6 +43,8 @@ export class AuthService {
         name: dto.name,
         timezone: dto.timezone || 'UTC',
         locale: dto.locale || 'en',
+        role: (dto.role as any) ?? 'student',
+        trialEndsAt,
       },
     });
 

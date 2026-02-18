@@ -79,4 +79,45 @@ export class CalendarService {
 
     return available;
   }
+
+  async getMyCalendar(userId: string, from: string, to: string) {
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+
+    const [appointments, pendingRequests] = await Promise.all([
+      this.prisma.appointment.findMany({
+        where: {
+          OR: [{ teacherId: userId }, { studentId: userId }],
+          startAt: { gte: fromDate },
+          endAt: { lte: toDate },
+          status: { not: 'canceled' },
+        },
+        include: {
+          teacher: { select: { id: true, name: true, email: true } },
+          student: { select: { id: true, name: true, email: true } },
+          classroom: { select: { id: true, name: true } },
+        },
+        orderBy: { startAt: 'asc' },
+      }),
+      this.prisma.bookingRequest.findMany({
+        where: {
+          OR: [
+            { studentId: userId },
+            { requestedTeacherId: userId },
+          ],
+          startAt: { gte: fromDate },
+          endAt: { lte: toDate },
+          status: 'pending',
+        },
+        include: {
+          student: { select: { id: true, name: true, email: true } },
+          requestedTeacher: { select: { id: true, name: true, email: true } },
+          classroom: { select: { id: true, name: true } },
+        },
+        orderBy: { startAt: 'asc' },
+      }),
+    ]);
+
+    return { appointments, pendingRequests };
+  }
 }

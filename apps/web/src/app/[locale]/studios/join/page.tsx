@@ -12,7 +12,7 @@ export default function StudioJoinPage({ params: { locale } }: { params: { local
   const [success, setSuccess] = useState(false);
 
   const joinMutation = useMutation({
-    mutationFn: () => api.post('/invites/join', { code }),
+    mutationFn: () => api.post('/studios/join', { code }),
     onSuccess: () => setSuccess(true),
   });
 
