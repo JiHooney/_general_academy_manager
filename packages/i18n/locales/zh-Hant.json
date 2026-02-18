@@ -1,0 +1,10 @@
+{
+  "common": { "save": "儲存", "cancel": "取消", "delete": "刪除", "edit": "編輯", "loading": "載入中…", "error": "發生錯誤", "success": "成功", "confirm": "確認", "back": "返回", "next": "下一步", "submit": "送出", "close": "關閉" },
+  "auth": { "login": "登入", "logout": "登出", "signup": "註冊", "email": "電子信箱", "password": "密碼", "name": "姓名", "forgotPassword": "忘記密碼？", "noAccount": "還沒有帳號？", "haveAccount": "已有帳號？", "unauthorized": "請登入以繼續", "forbidden": "您沒有執行此操作的權限" },
+  "studio": { "title": "工作室", "create": "建立工作室", "name": "工作室名稱", "empty": "尚無工作室" },
+  "classroom": { "title": "教室", "create": "建立教室", "name": "教室名稱", "description": "描述", "timezone": "時區", "empty": "尚無教室", "members": "成員", "calendar": "行事曆" },
+  "booking": { "request": "預約課程", "startAt": "開始時間", "endAt": "結束時間", "teacher": "老師", "recommend": "推薦老師", "message": "留言（選填）", "status": { "pending": "待確認", "accepted": "已接受", "rejected": "已拒絕", "canceled": "已取消", "expired": "已過期" }, "accept": "接受", "reject": "拒絕", "cancel": "取消" },
+  "schedule": { "conflict": "此時段已有預約", "month": "月", "week": "週", "day": "日", "addEvent": "新增事件", "noEvents": "沒有事件" },
+  "notification": { "title": "通知", "empty": "沒有通知", "markRead": "標記為已讀", "types": { "booking_request": "新預約請求", "booking_accepted": "預約已接受", "booking_rejected": "預約已拒絕", "booking_canceled": "預約已取消", "appointment_canceled": "課程已取消", "appointment_rescheduled": "課程已改期", "general": "通知" } },
+  "ticket": { "title": "支援票", "create": "建立票", "titleField": "標題", "content": "內容", "status": { "open": "開啟", "in_progress": "處理中", "closed": "關閉" } }
+}

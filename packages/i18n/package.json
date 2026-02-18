@@ -1,0 +1,13 @@
+{
+  "name": "@gam/i18n",
+  "version": "0.0.1",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": "./index.js",
+    "./locales/*": "./locales/*.json"
+  },
+  "scripts": {
+    "lint": "echo 'no src to lint'"
+  }
+}

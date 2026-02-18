@@ -1,0 +1,109 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "success": "Success",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "close": "Close"
+  },
+  "auth": {
+    "login": "Log In",
+    "logout": "Log Out",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "unauthorized": "Please log in to continue",
+    "forbidden": "You don't have permission to do this"
+  },
+  "studio": {
+    "title": "Studios",
+    "create": "Create Studio",
+    "name": "Studio Name",
+    "empty": "No studios yet"
+  },
+  "classroom": {
+    "title": "Classrooms",
+    "create": "Create Classroom",
+    "name": "Classroom Name",
+    "description": "Description",
+    "timezone": "Timezone",
+    "empty": "No classrooms yet",
+    "members": "Members",
+    "calendar": "Calendar"
+  },
+  "invite": {
+    "title": "Invite",
+    "create": "Create Invite Code",
+    "join": "Join with Code",
+    "code": "Invite Code",
+    "type": "Role",
+    "expiresAt": "Expires At",
+    "maxUses": "Max Uses",
+    "revoke": "Revoke",
+    "expired": "This invite has expired",
+    "revoked": "This invite has been revoked",
+    "maxUsesReached": "This invite has reached its maximum uses"
+  },
+  "booking": {
+    "request": "Book a Session",
+    "startAt": "Start Time",
+    "endAt": "End Time",
+    "teacher": "Teacher",
+    "recommend": "Recommend Teacher",
+    "message": "Message (optional)",
+    "status": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "canceled": "Canceled",
+      "expired": "Expired"
+    },
+    "accept": "Accept",
+    "reject": "Reject",
+    "cancel": "Cancel"
+  },
+  "schedule": {
+    "conflict": "This time slot conflicts with an existing appointment",
+    "month": "Month",
+    "week": "Week",
+    "day": "Day",
+    "addEvent": "Add Event",
+    "noEvents": "No events"
+  },
+  "notification": {
+    "title": "Notifications",
+    "empty": "No notifications",
+    "markRead": "Mark as read",
+    "types": {
+      "booking_request": "New booking request",
+      "booking_accepted": "Booking accepted",
+      "booking_rejected": "Booking rejected",
+      "booking_canceled": "Booking canceled",
+      "appointment_canceled": "Appointment canceled",
+      "appointment_rescheduled": "Appointment rescheduled",
+      "general": "Notification"
+    }
+  },
+  "ticket": {
+    "title": "Support Tickets",
+    "create": "Create Ticket",
+    "titleField": "Title",
+    "content": "Content",
+    "status": {
+      "open": "Open",
+      "in_progress": "In Progress",
+      "closed": "Closed"
+    }
+  }
+}

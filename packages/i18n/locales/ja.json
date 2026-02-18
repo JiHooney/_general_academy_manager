@@ -1,0 +1,96 @@
+{
+  "common": {
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "loading": "読み込み中…",
+    "error": "エラーが発生しました",
+    "success": "成功",
+    "confirm": "確認",
+    "back": "戻る",
+    "next": "次へ",
+    "submit": "送信",
+    "close": "閉じる"
+  },
+  "auth": {
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "signup": "サインアップ",
+    "email": "メール",
+    "password": "パスワード",
+    "name": "名前",
+    "forgotPassword": "パスワードをお忘れですか？",
+    "noAccount": "アカウントをお持ちでないですか？",
+    "haveAccount": "すでにアカウントをお持ちですか？",
+    "unauthorized": "続けるにはログインしてください",
+    "forbidden": "権限がありません"
+  },
+  "studio": {
+    "title": "スタジオ",
+    "create": "スタジオを作成",
+    "name": "スタジオ名",
+    "empty": "スタジオがありません"
+  },
+  "classroom": {
+    "title": "クラスルーム",
+    "create": "クラスルームを作成",
+    "name": "クラスルーム名",
+    "description": "説明",
+    "timezone": "タイムゾーン",
+    "empty": "クラスルームがありません",
+    "members": "メンバー",
+    "calendar": "カレンダー"
+  },
+  "booking": {
+    "request": "授業を予約",
+    "startAt": "開始時間",
+    "endAt": "終了時間",
+    "teacher": "先生",
+    "recommend": "先生を探す",
+    "message": "メッセージ（任意）",
+    "status": {
+      "pending": "保留中",
+      "accepted": "承認済み",
+      "rejected": "却下",
+      "canceled": "キャンセル済み",
+      "expired": "期限切れ"
+    },
+    "accept": "承認",
+    "reject": "却下",
+    "cancel": "キャンセル"
+  },
+  "schedule": {
+    "conflict": "この時間帯はすでに予約されています",
+    "month": "月",
+    "week": "週",
+    "day": "日",
+    "addEvent": "予定を追加",
+    "noEvents": "予定はありません"
+  },
+  "notification": {
+    "title": "通知",
+    "empty": "通知はありません",
+    "markRead": "既読にする",
+    "types": {
+      "booking_request": "新しい予約リクエスト",
+      "booking_accepted": "予約が承認されました",
+      "booking_rejected": "予約が却下されました",
+      "booking_canceled": "予約がキャンセルされました",
+      "appointment_canceled": "授業がキャンセルされました",
+      "appointment_rescheduled": "授業が変更されました",
+      "general": "通知"
+    }
+  },
+  "ticket": {
+    "title": "サポートチケット",
+    "create": "チケットを作成",
+    "titleField": "タイトル",
+    "content": "内容",
+    "status": {
+      "open": "オープン",
+      "in_progress": "対応中",
+      "closed": "クローズ"
+    }
+  }
+}

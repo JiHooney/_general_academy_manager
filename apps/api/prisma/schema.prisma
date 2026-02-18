@@ -1,0 +1,210 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Users ───────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String
+  timezone     String   @default("UTC")
+  locale       String   @default("en")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  organizations       Organization[]
+  createdStudios      Studio[]           @relation("StudioCreator")
+  createdClassrooms   Classroom[]        @relation("ClassroomCreator")
+  memberships         ClassroomMembership[]
+  invitesCreated      InviteCode[]
+  bookingRequestsAsStudent BookingRequest[] @relation("BookingStudent")
+  bookingRequestsAsTeacher BookingRequest[] @relation("BookingTeacher")
+  appointmentsAsTeacher Appointment[]     @relation("AppointmentTeacher")
+  appointmentsAsStudent Appointment[]     @relation("AppointmentStudent")
+  notifications       Notification[]
+  supportTickets      SupportTicket[]
+
+  @@map("users")
+}
+
+// ─── Organizations ────────────────────────────────────────────────────────────
+
+model Organization {
+  id               String   @id @default(uuid())
+  name             String
+  ownerUserId      String   @map("owner_user_id")
+  defaultTimezone  String   @default("UTC") @map("default_timezone")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  owner   User     @relation(fields: [ownerUserId], references: [id])
+  studios Studio[]
+
+  @@map("organizations")
+}
+
+// ─── Studios ─────────────────────────────────────────────────────────────────
+
+model Studio {
+  id             String   @id @default(uuid())
+  organizationId String   @map("organization_id")
+  name           String
+  createdBy      String   @map("created_by")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  creator      User         @relation("StudioCreator", fields: [createdBy], references: [id])
+  classrooms   Classroom[]
+
+  @@map("studios")
+}
+
+// ─── Classrooms ───────────────────────────────────────────────────────────────
+
+model Classroom {
+  id          String   @id @default(uuid())
+  studioId    String   @map("studio_id")
+  name        String
+  description String?
+  timezone    String   @default("UTC")
+  createdBy   String   @map("created_by")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  studio      Studio                @relation(fields: [studioId], references: [id])
+  creator     User                  @relation("ClassroomCreator", fields: [createdBy], references: [id])
+  memberships ClassroomMembership[]
+  inviteCodes InviteCode[]
+  bookingRequests BookingRequest[]
+  appointments Appointment[]
+  tickets     SupportTicket[]
+
+  @@map("classrooms")
+}
+
+// ─── Classroom Memberships ────────────────────────────────────────────────────
+
+model ClassroomMembership {
+  id              String   @id @default(uuid())
+  classroomId     String   @map("classroom_id")
+  userId          String   @map("user_id")
+  roleInClassroom String   @map("role_in_classroom") // admin | teacher | student
+  status          String   @default("active")         // active | pending | blocked
+  joinedAt        DateTime @default(now()) @map("joined_at") @db.Timestamptz
+
+  classroom Classroom @relation(fields: [classroomId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@unique([classroomId, userId])
+  @@index([classroomId])
+  @@index([userId])
+  @@map("classroom_memberships")
+}
+
+// ─── Invite Codes ─────────────────────────────────────────────────────────────
+
+model InviteCode {
+  id          String    @id @default(uuid())
+  classroomId String    @map("classroom_id")
+  code        String    @unique
+  type        String                          // student | teacher
+  expiresAt   DateTime? @map("expires_at") @db.Timestamptz
+  maxUses     Int?      @map("max_uses")
+  usedCount   Int       @default(0) @map("used_count")
+  isRevoked   Boolean   @default(false) @map("is_revoked")
+  createdBy   String    @map("created_by")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  classroom Classroom @relation(fields: [classroomId], references: [id])
+  creator   User      @relation(fields: [createdBy], references: [id])
+
+  @@index([code])
+  @@map("invite_codes")
+}
+
+// ─── Booking Requests ─────────────────────────────────────────────────────────
+
+model BookingRequest {
+  id                String    @id @default(uuid())
+  classroomId       String    @map("classroom_id")
+  requestedTeacherId String?  @map("requested_teacher_id")
+  studentId         String    @map("student_id")
+  startAt           DateTime  @map("start_at") @db.Timestamptz
+  endAt             DateTime  @map("end_at") @db.Timestamptz
+  message           String?
+  status            String    @default("pending") // pending|accepted|rejected|canceled|expired
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  respondedAt       DateTime? @map("responded_at") @db.Timestamptz
+
+  classroom        Classroom @relation(fields: [classroomId], references: [id])
+  student          User      @relation("BookingStudent", fields: [studentId], references: [id])
+  requestedTeacher User?     @relation("BookingTeacher", fields: [requestedTeacherId], references: [id])
+
+  @@index([classroomId, startAt])
+  @@index([studentId])
+  @@map("booking_requests")
+}
+
+// ─── Appointments ─────────────────────────────────────────────────────────────
+
+model Appointment {
+  id          String   @id @default(uuid())
+  classroomId String   @map("classroom_id")
+  teacherId   String   @map("teacher_id")
+  studentId   String   @map("student_id")
+  startAt     DateTime @map("start_at") @db.Timestamptz
+  endAt       DateTime @map("end_at") @db.Timestamptz
+  status      String   @default("confirmed") // confirmed | canceled | rescheduled
+  note        String?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  classroom Classroom @relation(fields: [classroomId], references: [id])
+  teacher   User      @relation("AppointmentTeacher", fields: [teacherId], references: [id])
+  student   User      @relation("AppointmentStudent", fields: [studentId], references: [id])
+
+  @@index([classroomId, startAt])
+  @@index([teacherId, startAt, endAt])
+  @@map("appointments")
+}
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+
+model Notification {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  type        String
+  payloadJson Json     @default("{}") @map("payload_json")
+  isRead      Boolean  @default(false) @map("is_read")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+// ─── Support Tickets ──────────────────────────────────────────────────────────
+
+model SupportTicket {
+  id          String   @id @default(uuid())
+  classroomId String   @map("classroom_id")
+  createdBy   String   @map("created_by")
+  title       String
+  content     String
+  status      String   @default("open") // open | in_progress | closed
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  classroom Classroom @relation(fields: [classroomId], references: [id])
+  creator   User      @relation(fields: [createdBy], references: [id])
+
+  @@index([classroomId])
+  @@map("support_tickets")
+}

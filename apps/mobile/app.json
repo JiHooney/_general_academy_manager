@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "GAM",
+    "slug": "gam-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "gam",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": { "supportsTablet": true, "bundleIdentifier": "com.gam.mobile" },
+    "android": { "adaptiveIcon": { "backgroundColor": "#ffffff" }, "package": "com.gam.mobile" },
+    "plugins": ["expo-router"],
+    "experiments": { "typedRoutes": true }
+  }
+}
