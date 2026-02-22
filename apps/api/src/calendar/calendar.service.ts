@@ -45,15 +45,24 @@ export class CalendarService {
     const start = new Date(startAt);
     const end = new Date(endAt);
 
-    // Get all teachers in the classroom
-    const memberships = await this.prisma.classroomMembership.findMany({
+    // Get classroom to find its studioId
+    const classroom = await this.prisma.classroom.findUnique({
+      where: { id: classroomId },
+      select: { studioId: true },
+    });
+    if (!classroom) return [];
+
+    // Get all studio members with teacher role (studio-scoped teacher designation)
+    const teacherMemberships = await this.prisma.studioMembership.findMany({
       where: {
-        classroomId,
-        roleInClassroom: { in: ['teacher', 'admin'] },
-        status: 'active',
+        studioId: classroom.studioId,
+        role: 'teacher',
       },
       include: { user: true },
     });
+
+    // Simulate memberships shape expected below
+    const memberships = teacherMemberships.map((m) => ({ userId: m.userId, user: m.user }));
 
     // Find teachers with conflicting confirmed appointments
     const busyTeacherIds = await this.prisma.appointment
