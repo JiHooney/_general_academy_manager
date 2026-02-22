@@ -41,7 +41,13 @@
     "title": "Studios",
     "create": "Create Studio",
     "name": "Studio Name",
-    "empty": "No studios yet"
+    "empty": "No studios yet",
+    "members": "Members",
+    "teacherBadge": "Teacher",
+    "studentBadge": "Student",
+    "setTeacher": "Set as Teacher",
+    "setStudent": "Set as Student",
+    "you": "(you)"
   },
   "classroom": {
     "title": "Classrooms",
@@ -116,5 +122,30 @@
       "in_progress": "In Progress",
       "closed": "Closed"
     }
+  },
+  "nav": {
+    "back": "Back",
+    "homeBtn": "Home",
+    "menu": "Menu",
+    "menuTitle": "Menu",
+    "navHome": "Home (Dashboard)",
+    "navStudios": "Studio List",
+    "navCreateStudio": "Create Studio",
+    "navJoinStudio": "Join Studio",
+    "navSchedule": "My Schedule",
+    "navRequests": "Manage Requests",
+    "logout": "Log Out"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "greeting": "Hello,",
+    "studios": "Studio List",
+    "studiosDesc": "View joined studios",
+    "createStudio": "Create Studio",
+    "createStudioDesc": "Create a new studio",
+    "joinStudio": "Join Studio",
+    "joinStudioDesc": "Join with invite code",
+    "requestsTitle": "Manage Requests",
+    "requestsDesc": "Teacher only"
   }
 }

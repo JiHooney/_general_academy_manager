@@ -41,7 +41,13 @@
     "title": "スタジオ",
     "create": "スタジオを作成",
     "name": "スタジオ名",
-    "empty": "スタジオがありません"
+    "empty": "スタジオがありません",
+    "members": "メンバー",
+    "teacherBadge": "先生",
+    "studentBadge": "生徒",
+    "setTeacher": "先生に指定",
+    "setStudent": "生徒に変更",
+    "you": "(自分)"
   },
   "classroom": {
     "title": "クラスルーム",
@@ -103,5 +109,30 @@
       "in_progress": "対応中",
       "closed": "クローズ"
     }
+  },
+  "nav": {
+    "back": "戻る",
+    "homeBtn": "ホーム",
+    "menu": "メニュー",
+    "menuTitle": "メニュー",
+    "navHome": "ホーム（ダッシュボード）",
+    "navStudios": "スタジオ一覧",
+    "navCreateStudio": "スタジオ作成",
+    "navJoinStudio": "スタジオに参加",
+    "navSchedule": "マイスケジュール",
+    "navRequests": "リクエスト管理",
+    "logout": "ログアウト"
+  },
+  "dashboard": {
+    "title": "ダッシュボード",
+    "greeting": "こんにちは,",
+    "studios": "スタジオ一覧",
+    "studiosDesc": "参加中のスタジオを見る",
+    "createStudio": "スタジオ作成",
+    "createStudioDesc": "新しいスタジオを作成",
+    "joinStudio": "スタジオに参加",
+    "joinStudioDesc": "招待コードで参加",
+    "requestsTitle": "リクエスト管理",
+    "requestsDesc": "先生専用"
   }
 }

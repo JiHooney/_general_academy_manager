@@ -102,11 +102,36 @@ export class StudiosService {
     return { message: '스튜디오에 참가했습니다', studioId: invite.studioId };
   }
 
-  /** 스튜디오의 현재 유효한 초대코드 목록 */
+  /** 스튜디오의 초대코드 목록 */
   getInviteCodes(studioId: string) {
     return (this.prisma as any).studioInviteCode.findMany({
       where: { studioId, isRevoked: false },
       orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  /** 스튜디오 멤버 목록 */
+  async getMembers(studioId: string) {
+    return (this.prisma as any).studioMembership.findMany({
+      where: { studioId },
+      include: { user: { select: { id: true, name: true, email: true } } },
+      orderBy: { joinedAt: 'asc' },
+    });
+  }
+
+  /** 멤버 역할 변경 (creator 전용) */
+  async setMemberRole(studioId: string, targetUserId: string, role: string, requesterId: string) {
+    const studio = await this.prisma.studio.findUnique({ where: { id: studioId } });
+    if (!studio) throw new NotFoundException('Studio not found');
+    if (studio.createdBy !== requesterId)
+      throw new ForbiddenException('스튜디오 창설자만 멤버 역할을 변경할 수 있습니다');
+    const membership = await (this.prisma as any).studioMembership.findUnique({
+      where: { studioId_userId: { studioId, userId: targetUserId } },
+    });
+    if (!membership) throw new NotFoundException('Member not found');
+    return (this.prisma as any).studioMembership.update({
+      where: { studioId_userId: { studioId, userId: targetUserId } },
+      data: { role },
     });
   }
 }

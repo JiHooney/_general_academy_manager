@@ -41,7 +41,13 @@
     "title": "스튜디오",
     "create": "스튜디오 만들기",
     "name": "스튜디오 이름",
-    "empty": "스튜디오가 없습니다"
+    "empty": "스튜디오가 없습니다",
+    "members": "멤버",
+    "teacherBadge": "선생님",
+    "studentBadge": "학생",
+    "setTeacher": "선생님으로 지정",
+    "setStudent": "학생으로 변경",
+    "you": "(나)"
   },
   "classroom": {
     "title": "클래스룸",
@@ -115,6 +121,29 @@
       "open": "열림",
       "in_progress": "진행 중",
       "closed": "닫힘"
-    }
-  }
+    }  },
+  "nav": {
+    "back": "뒤로",
+    "homeBtn": "홈",
+    "menu": "메뉴",
+    "menuTitle": "메뉴",
+    "navHome": "홈 (대시보드)",
+    "navStudios": "스튜디오 목록",
+    "navCreateStudio": "스튜디오 생성",
+    "navJoinStudio": "스튜디오 참가",
+    "navSchedule": "내 일정",
+    "navRequests": "수업 요청 관리",
+    "logout": "로그아웃"
+  },
+  "dashboard": {
+    "title": "대시보드",
+    "greeting": "안녕하세요,",
+    "studios": "스튜디오 목록",
+    "studiosDesc": "가입한 스튜디오 보기",
+    "createStudio": "스튜디오 생성",
+    "createStudioDesc": "새 스튜디오 만들기",
+    "joinStudio": "스튜디오 참가",
+    "joinStudioDesc": "초대 코드로 참가",
+    "requestsTitle": "수업 요청 관리",
+    "requestsDesc": "선생님 전용"  }
 }

@@ -1,10 +1,12 @@
 {
   "common": { "save": "保存", "cancel": "取消", "delete": "删除", "edit": "编辑", "loading": "加载中…", "error": "发生错误", "success": "成功", "confirm": "确认", "back": "返回", "next": "下一步", "submit": "提交", "close": "关闭" },
   "auth": { "login": "登录", "logout": "退出", "signup": "注册", "email": "邮筱", "password": "密码", "name": "姓名", "forgotPassword": "忘记密码？", "noAccount": "还没有账号？", "haveAccount": "已有账号？", "unauthorized": "请登录后继续", "forbidden": "您没有执行此操作的权限", "roleStudent": "学生", "roleTeacher": "老师", "countryLabel": "🌍 国家/地区", "timezoneLabel": "时区", "address": "地址", "addressSearchPlaceholder": "搜索街道或建筑名称", "addressDetailPlaceholder": "详细地址（房间号等，选填）", "postalCode": "邮政编码", "searching": "搜索中...", "signupAsStudent": "🎓 以学生身份注册", "signupAsTeacher": "👨‍🏫 以老师身份注册" },
-  "studio": { "title": "工作室", "create": "创建工作室", "name": "工作室名称", "empty": "暂无工作室" },
+  "studio": { "title": "工作室", "create": "创建工作室", "name": "工作室名称", "empty": "暂无工作室", "members": "成员", "teacherBadge": "老师", "studentBadge": "学生", "setTeacher": "指定为老师", "setStudent": "设为学生", "you": "(我)"},
   "classroom": { "title": "教室", "create": "创建教室", "name": "教室名称", "description": "描述", "timezone": "时区", "empty": "暂无教室", "members": "成员", "calendar": "日历" },
   "booking": { "request": "预约课程", "startAt": "开始时间", "endAt": "结束时间", "teacher": "老师", "recommend": "推荐老师", "message": "留言（选填）", "status": { "pending": "待确认", "accepted": "已接受", "rejected": "已拒绝", "canceled": "已取消", "expired": "已过期" }, "accept": "接受", "reject": "拒绝", "cancel": "取消" },
   "schedule": { "conflict": "该时段已有预约", "month": "月", "week": "周", "day": "日", "addEvent": "添加事件", "noEvents": "没有事件" },
   "notification": { "title": "通知", "empty": "没有通知", "markRead": "标记为已读", "types": { "booking_request": "新预约请求", "booking_accepted": "预约已接受", "booking_rejected": "预约已拒绝", "booking_canceled": "预约已取消", "appointment_canceled": "课程已取消", "appointment_rescheduled": "课程已改期", "general": "通知" } },
-  "ticket": { "title": "支持票", "create": "创建票", "titleField": "标题", "content": "内容", "status": { "open": "开启", "in_progress": "处理中", "closed": "关闭" } }
+  "ticket": { "title": "支持票", "create": "创建票", "titleField": "标题", "content": "内容", "status": { "open": "开启", "in_progress": "处理中", "closed": "关闭" } },
+  "nav": { "back": "返回", "homeBtn": "首页", "menu": "菜单", "menuTitle": "菜单", "navHome": "首页（仪表盘）", "navStudios": "工作室列表", "navCreateStudio": "创建工作室", "navJoinStudio": "加入工作室", "navSchedule": "我的日程", "navRequests": "管理请求", "logout": "退出" },
+  "dashboard": { "title": "仪表盘", "greeting": "你好,", "studios": "工作室列表", "studiosDesc": "查看已加入的工作室", "createStudio": "创建工作室", "createStudioDesc": "创建新工作室", "joinStudio": "加入工作室", "joinStudioDesc": "使用邀请码加入", "requestsTitle": "管理请求", "requestsDesc": "仅限老师" }
 }

@@ -17,6 +17,15 @@ const COMMON_TIMEZONES = [
   'Australia/Sydney', 'Pacific/Auckland', 'UTC',
 ];
 
+interface Me { id: string; role: string; timezone?: string; }
+interface StudioMember {
+  id: string;
+  userId: string;
+  role: string;
+  user: { id: string; name: string; email: string };
+}
+interface Studio { id: string; name: string; createdBy: string; }
+
 interface Props {
   params: { locale: string; studioId: string };
 }
@@ -33,9 +42,23 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
 
   const { data: me } = useQuery({
     queryKey: ['me'],
-    queryFn: () => api.get<{ role: string; timezone?: string }>('/auth/me'),
+    queryFn: () => api.get<Me>('/auth/me'),
   });
-  const isTeacher = me?.role === 'teacher' || me?.role === 'admin';
+
+  const { data: studio } = useQuery({
+    queryKey: ['studio', studioId],
+    queryFn: () => api.get<Studio>(`/studios/${studioId}`),
+  });
+
+  const { data: members = [], isLoading: membersLoading } = useQuery({
+    queryKey: ['studio-members', studioId],
+    queryFn: () => api.get<StudioMember[]>(`/studios/${studioId}/members`),
+  });
+
+  // 현재 유저의 스튜디오 멤버십 역할로 isTeacher 결정
+  const myMembership = members.find((m) => m.userId === me?.id);
+  const isTeacher = myMembership?.role === 'teacher' || me?.role === 'admin';
+  const isCreator = studio?.createdBy === me?.id || me?.role === 'admin';
 
   // 사용자 timezone으로 기본값 자동 설정
   useEffect(() => {
@@ -45,6 +68,12 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
   const generateInviteMutation = useMutation({
     mutationFn: () => api.post<{ code: string }>(`/studios/${studioId}/invites`, {}),
     onSuccess: (data) => setInviteCode(data.code),
+  });
+
+  const setRoleMutation = useMutation({
+    mutationFn: ({ userId, role }: { userId: string; role: string }) =>
+      api.patch(`/studios/${studioId}/members/${userId}`, { role }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['studio-members', studioId] }),
   });
 
   const copyCode = () => {
@@ -73,7 +102,7 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
 
   return (
     <>
-      <NavHeader locale={locale} title="클래스룸" showBack backHref={`/${locale}/studios`} />
+      <NavHeader locale={locale} title={t('classroom.title')} showBack backHref={`/${locale}/studios`} />
 
       <main className="max-w-4xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -85,7 +114,7 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
               disabled={generateInviteMutation.isPending}
               className="border border-amber-500 text-amber-600 px-4 py-2 rounded-lg hover:bg-amber-50 transition text-sm font-medium"
             >
-              🔑 초대코드 생성
+              🔑 {t('invite.create')}
             </button>
           )}
           <button
@@ -101,14 +130,14 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
       {inviteCode && (
         <div className="bg-amber-50 border border-amber-300 rounded-xl p-4 flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs text-amber-600 font-semibold mb-1">📨 학생에게 이 코드를 공유하세요</p>
+            <p className="text-xs text-amber-600 font-semibold mb-1">📨 {t('invite.code')}</p>
             <p className="font-mono text-2xl font-bold text-amber-800 tracking-widest">{inviteCode}</p>
           </div>
           <button
             onClick={copyCode}
             className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition text-sm font-medium whitespace-nowrap"
           >
-            {copied ? '✅ 복사됨' : '📋 복사'}
+            {copied ? '✅' : '📋'}
           </button>
         </div>
       )}
@@ -172,6 +201,51 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
           ))}
         </ul>
       )}
+
+      {/* ─── 멤버 관리 ─────────────────────────────────── */}
+      <div className="bg-white border rounded-xl p-6 shadow-sm space-y-4">
+        <h2 className="font-semibold text-lg">👥 {t('studio.members')}</h2>
+        {membersLoading ? (
+          <p className="text-gray-400 text-sm">{t('common.loading')}</p>
+        ) : (
+          <ul className="divide-y">
+            {members.map((m) => (
+              <li key={m.id} className="flex items-center justify-between py-3">
+                <div>
+                  <p className="font-medium text-sm text-gray-800">
+                    {m.user.name}
+                    {m.userId === me?.id && (
+                      <span className="ml-1 text-xs text-gray-400">{t('studio.you')}</span>
+                    )}
+                  </p>
+                  <p className="text-xs text-gray-400">{m.user.email}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                    m.role === 'teacher'
+                      ? 'bg-amber-100 text-amber-700'
+                      : 'bg-blue-100 text-blue-700'
+                  }`}>
+                    {m.role === 'teacher' ? t('studio.teacherBadge') : t('studio.studentBadge')}
+                  </span>
+                  {isCreator && m.userId !== me?.id && (
+                    <button
+                      onClick={() => setRoleMutation.mutate({
+                        userId: m.userId,
+                        role: m.role === 'teacher' ? 'student' : 'teacher',
+                      })}
+                      disabled={setRoleMutation.isPending}
+                      className="text-xs border px-2 py-1 rounded-lg hover:bg-gray-50 transition text-gray-600 disabled:opacity-50"
+                    >
+                      {m.role === 'teacher' ? t('studio.setStudent') : t('studio.setTeacher')}
+                    </button>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </main>
     </>
   );

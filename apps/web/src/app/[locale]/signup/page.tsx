@@ -60,7 +60,6 @@ export default function SignupPage({ params: { locale } }: { params: { locale: s
     timezone: 'Asia/Seoul',
     locale: locale,
   });
-  const [role, setRole] = useState<'student' | 'teacher'>('student');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -128,7 +127,6 @@ export default function SignupPage({ params: { locale } }: { params: { locale: s
     try {
       await api.post('/auth/signup', {
         ...form,
-        role,
         country,
         addressMain: addressMain || undefined,
         addressDetail: addressDetail || undefined,
@@ -150,33 +148,7 @@ export default function SignupPage({ params: { locale } }: { params: { locale: s
           <LanguageSwitcher currentLocale={locale} />
         </div>
 
-        {/* 역할 선택 */}
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => setRole('student')}
-            className={`border-2 rounded-xl p-3 text-center transition ${
-              role === 'student'
-                ? 'border-primary-600 bg-primary-50 text-primary-700'
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-          >
-            <div className="text-2xl mb-1">🎓</div>
-            <div className="font-semibold text-sm">{t('roleStudent')}</div>
-          </button>
-          <button
-            type="button"
-            onClick={() => setRole('teacher')}
-            className={`border-2 rounded-xl p-3 text-center transition ${
-              role === 'teacher'
-                ? 'border-amber-500 bg-amber-50 text-amber-700'
-                : 'border-gray-200 hover:border-gray-300'
-            }`}
-          >
-            <div className="text-2xl mb-1">👨‍🏫</div>
-            <div className="font-semibold text-sm">{t('roleTeacher')}</div>
-          </button>
-        </div>
+        {/* 역할 선택 제거됨 - 스튜디오 내에서 선생님 지정 */}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {(['name', 'email', 'password'] as const).map((field) => (
@@ -287,7 +259,7 @@ export default function SignupPage({ params: { locale } }: { params: { locale: s
             disabled={loading}
             className="w-full bg-primary-600 text-white py-2 rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
           >
-            {loading ? '...' : (role === 'teacher' ? t('signupAsTeacher') : t('signupAsStudent'))}
+            {loading ? '...' : t('signup')}
           </button>
         </form>
 

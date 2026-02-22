@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { IsString, MinLength, MaxLength } from 'class-validator';
 import { StudiosService } from './studios.service';
@@ -8,6 +8,10 @@ import { User } from '@prisma/client';
 
 class JoinStudioDto {
   @IsString() @MinLength(1) @MaxLength(20) code: string;
+}
+
+class SetMemberRoleDto {
+  @IsString() role: string; // 'teacher' | 'student'
 }
 
 @ApiTags('studios')
@@ -44,6 +48,23 @@ export class StudiosController {
   @ApiOperation({ summary: 'List invite codes for a studio' })
   listInvites(@Param('studioId') studioId: string) {
     return this.studiosService.getInviteCodes(studioId);
+  }
+
+  @Get(':studioId/members')
+  @ApiOperation({ summary: 'List members of a studio' })
+  getMembers(@Param('studioId') studioId: string) {
+    return this.studiosService.getMembers(studioId);
+  }
+
+  @Patch(':studioId/members/:userId')
+  @ApiOperation({ summary: 'Set a member role in a studio (creator only)' })
+  setMemberRole(
+    @Param('studioId') studioId: string,
+    @Param('userId') userId: string,
+    @Body() dto: SetMemberRoleDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.studiosService.setMemberRole(studioId, userId, dto.role, user.id);
   }
 
   @Post('join')

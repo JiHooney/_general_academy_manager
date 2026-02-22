@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { api } from '../lib/api';
 import { LanguageSwitcher } from './language-switcher';
 
@@ -11,12 +12,12 @@ interface NavHeaderProps {
   title?: string;
   showBack?: boolean;
   backHref?: string;
-  /** 현재 로그인 유저 역할 (teacher 여부 확인 용) */
   role?: string;
 }
 
 export function NavHeader({ locale, title, showBack, backHref, role }: NavHeaderProps) {
   const router = useRouter();
+  const t = useTranslations('nav');
   const [menuOpen, setMenuOpen] = useState(false);
 
   const home = `/${locale}/dashboard`;
@@ -39,7 +40,7 @@ export function NavHeader({ locale, title, showBack, backHref, role }: NavHeader
                 href={backHref ?? home}
                 className="flex items-center gap-1 text-gray-600 hover:text-gray-900 text-sm font-medium"
               >
-                ← 뒤로
+                ← {t('back')}
               </Link>
             )}
             <Link href={home} className="text-primary-700 font-bold text-lg">
@@ -56,13 +57,13 @@ export function NavHeader({ locale, title, showBack, backHref, role }: NavHeader
               href={home}
               className="text-sm text-gray-600 border border-gray-300 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition"
             >
-              🏠 홈
+              🏠 {t('homeBtn')}
             </Link>
             <button
               onClick={() => setMenuOpen((v) => !v)}
               className="text-sm bg-primary-600 text-white px-3 py-1.5 rounded-lg hover:bg-primary-700 transition"
             >
-              ☰ 메뉴
+              ☰ {t('menu')}
             </button>
           </div>
         </div>
@@ -76,14 +77,14 @@ export function NavHeader({ locale, title, showBack, backHref, role }: NavHeader
             onClick={() => setMenuOpen(false)}
           />
           <div className="fixed top-14 right-4 z-50 bg-white border rounded-xl shadow-lg w-56 py-2 overflow-hidden">
-            <p className="px-4 py-2 text-xs text-gray-400 font-semibold uppercase tracking-wide">메뉴</p>
+            <p className="px-4 py-2 text-xs text-gray-400 font-semibold uppercase tracking-wide">{t('menuTitle')}</p>
 
             <Link
               href={home}
               onClick={() => setMenuOpen(false)}
               className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700"
             >
-              🏠 홈 (대시보드)
+              🏠 {t('navHome')}
             </Link>
 
             <Link
@@ -91,7 +92,7 @@ export function NavHeader({ locale, title, showBack, backHref, role }: NavHeader
               onClick={() => setMenuOpen(false)}
               className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700"
             >
-              🏫 스튜디오 목록
+              🏫 {t('navStudios')}
             </Link>
 
             <Link
@@ -99,7 +100,7 @@ export function NavHeader({ locale, title, showBack, backHref, role }: NavHeader
               onClick={() => setMenuOpen(false)}
               className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700"
             >
-              ➕ 스튜디오 생성
+              ➕ {t('navCreateStudio')}
             </Link>
 
             <Link
@@ -107,7 +108,7 @@ export function NavHeader({ locale, title, showBack, backHref, role }: NavHeader
               onClick={() => setMenuOpen(false)}
               className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700"
             >
-              🔑 스튜디오 참가
+              🔑 {t('navJoinStudio')}
             </Link>
 
             <Link
@@ -115,7 +116,7 @@ export function NavHeader({ locale, title, showBack, backHref, role }: NavHeader
               onClick={() => setMenuOpen(false)}
               className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700"
             >
-              📅 내 일정
+              📅 {t('navSchedule')}
             </Link>
 
             {/* 선생님 전용 */}
@@ -126,7 +127,7 @@ export function NavHeader({ locale, title, showBack, backHref, role }: NavHeader
                   onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-sm text-amber-600 font-medium"
                 >
-                  📋 수업 요청 관리
+                  📋 {t('navRequests')}
                 </Link>
               </>
             ) : null}
@@ -137,7 +138,7 @@ export function NavHeader({ locale, title, showBack, backHref, role }: NavHeader
               onClick={() => { setMenuOpen(false); handleLogout(); }}
               className="w-full text-left flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 text-sm text-red-500"
             >
-              🚪 로그아웃
+              🚪 {t('logout')}
             </button>
           </div>
         </>
