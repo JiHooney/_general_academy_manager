@@ -23,11 +23,15 @@ model User {
   email        String   @unique
   passwordHash String   @map("password_hash")
   name         String
-  role         UserRole @default(student)
-  timezone     String   @default("UTC")
-  locale       String   @default("en")
-  trialEndsAt  DateTime? @map("trial_ends_at") @db.Timestamptz
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  role          UserRole @default(student)
+  timezone      String   @default("UTC")
+  locale        String   @default("en")
+  trialEndsAt   DateTime? @map("trial_ends_at") @db.Timestamptz
+  country       String?  @default("KR")
+  addressMain   String?  @map("address_main")
+  addressDetail String?  @map("address_detail")
+  postalCode    String?  @map("postal_code")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   organizations           Organization[]
   createdStudios          Studio[]             @relation("StudioCreator")

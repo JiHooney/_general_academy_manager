@@ -1,12 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { api } from '../../../../../lib/api';
 import type { Classroom } from '@gam/shared';
 import { NavHeader } from '../../../../../components/nav-header';
+
+const COMMON_TIMEZONES = [
+  'Asia/Seoul', 'Asia/Tokyo', 'Asia/Shanghai', 'Asia/Taipei', 'Asia/Hong_Kong',
+  'Asia/Singapore', 'Asia/Kolkata', 'Asia/Dubai',
+  'Europe/London', 'Europe/Paris', 'Europe/Berlin', 'Europe/Moscow',
+  'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles',
+  'America/Toronto', 'America/Sao_Paulo', 'America/Mexico_City',
+  'Australia/Sydney', 'Pacific/Auckland', 'UTC',
+];
 
 interface Props {
   params: { locale: string; studioId: string };
@@ -24,9 +33,14 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
 
   const { data: me } = useQuery({
     queryKey: ['me'],
-    queryFn: () => api.get<{ role: string }>('/auth/me'),
+    queryFn: () => api.get<{ role: string; timezone?: string }>('/auth/me'),
   });
   const isTeacher = me?.role === 'teacher' || me?.role === 'admin';
+
+  // 사용자 timezone으로 기본값 자동 설정
+  useEffect(() => {
+    if (me?.timezone) setTimezone(me.timezone);
+  }, [me?.timezone]);
 
   const generateInviteMutation = useMutation({
     mutationFn: () => api.post<{ code: string }>(`/studios/${studioId}/invites`, {}),
@@ -114,12 +128,15 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
             onChange={(e) => setDescription(e.target.value)}
             className="w-full border rounded-lg px-3 py-2"
           />
-          <input
-            placeholder={t('classroom.timezone')}
+          <select
             value={timezone}
             onChange={(e) => setTimezone(e.target.value)}
-            className="w-full border rounded-lg px-3 py-2"
-          />
+            className="w-full border rounded-lg px-3 py-2 bg-white"
+          >
+            {COMMON_TIMEZONES.map((tz) => (
+              <option key={tz} value={tz}>{tz}</option>
+            ))}
+          </select>
           <div className="flex gap-2">
             <button
               onClick={() => createMutation.mutate()}

@@ -47,13 +47,28 @@ export class StudiosService {
   }
 
   findOrganizations(userId: string) {
+    // 소유한 조직 + 소속 스튜디오가 있는 조직 모두 반환
     return this.prisma.organization.findMany({
-      where: { ownerUserId: userId },
+      where: {
+        OR: [
+          { ownerUserId: userId },
+          { studios: { some: { memberships: { some: { userId } } } } },
+        ],
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  createOrganization(name: string, userId: string) {
+  async createOrganization(name: string, userId: string) {
+    // 구독 여부 확인: trialEndsAt > now 이거나 admin
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new ForbiddenException('User not found');
+    if (user.role !== 'admin') {
+      const isTrialActive = user.trialEndsAt && user.trialEndsAt > new Date();
+      if (!isTrialActive) {
+        throw new ForbiddenException('조직을 생성하려면 활성 구독 또는 무료 체험이 필요합니다');
+      }
+    }
     return this.prisma.organization.create({
       data: { name, ownerUserId: userId },
     });

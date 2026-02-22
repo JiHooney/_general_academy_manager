@@ -45,6 +45,10 @@ export class AuthService {
         locale: dto.locale || 'en',
         role: (dto.role as any) ?? 'student',
         trialEndsAt,
+        country: dto.country || 'KR',
+        addressMain: dto.addressMain,
+        addressDetail: dto.addressDetail,
+        postalCode: dto.postalCode,
       },
     });
 

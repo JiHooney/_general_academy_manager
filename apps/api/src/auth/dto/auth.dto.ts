@@ -32,6 +32,29 @@ export class SignupDto {
   @IsOptional()
   @IsIn(['student', 'teacher'])
   role?: 'student' | 'teacher' = 'student';
+
+  @ApiProperty({ example: 'KR', required: false })
+  @IsOptional()
+  @IsString()
+  country?: string = 'KR';
+
+  @ApiProperty({ example: '서울특별시 강남구 테헤란로 123', required: false })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  addressMain?: string;
+
+  @ApiProperty({ example: '101호', required: false })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  addressDetail?: string;
+
+  @ApiProperty({ example: '06234', required: false })
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  postalCode?: string;
 }
 
 export class LoginDto {
