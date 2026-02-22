@@ -37,26 +37,12 @@ async function main() {
   });
   console.log('✔ Student:', student.email);
 
-  // 3. Create organization
-  const org = await prisma.organization.upsert({
-    where: { id: 'seed-org-0000-0000-0000-000000000001' },
-    update: {},
-    create: {
-      id: 'seed-org-0000-0000-0000-000000000001',
-      name: 'Demo Academy',
-      ownerUserId: teacher.id,
-      defaultTimezone: 'Asia/Seoul',
-    },
-  });
-  console.log('✔ Organization:', org.name);
-
-  // 4. Create studio
+  // 3. Create studio (no organization needed)
   const studio = await prisma.studio.upsert({
     where: { id: 'seed-std-0000-0000-0000-000000000001' },
     update: {},
     create: {
       id: 'seed-std-0000-0000-0000-000000000001',
-      organizationId: org.id,
       name: 'Main Studio',
       createdBy: teacher.id,
     },

@@ -25,7 +25,7 @@ export class StudiosController {
   @Get()
   @ApiOperation({ summary: 'List studios for current user' })
   findAll(@CurrentUser() user: User) {
-    return this.studiosService.findAll(user.id, (user as any).role);
+    return this.studiosService.findAll(user.id);
   }
 
   @Get(':studioId')

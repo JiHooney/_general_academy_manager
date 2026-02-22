@@ -61,7 +61,6 @@ export default function SignupPage({ params: { locale } }: { params: { locale: s
     locale: locale,
   });
   const [role, setRole] = useState<'student' | 'teacher'>('student');
-  const [agreeTrialTerm, setAgreeTrialTerm] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -124,10 +123,6 @@ export default function SignupPage({ params: { locale } }: { params: { locale: s
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (role === 'teacher' && !agreeTrialTerm) {
-      setError('선생님 가입 시 무료 체험 약관에 동의해야 합니다.');
-      return;
-    }
     setLoading(true);
     setError('');
     try {
@@ -181,30 +176,9 @@ export default function SignupPage({ params: { locale } }: { params: { locale: s
           >
             <div className="text-2xl mb-1">👨‍🏫</div>
             <div className="font-semibold text-sm">선생님</div>
-            <div className="text-xs text-amber-500 mt-0.5">1개월 무료체험</div>
+            <div className="text-xs text-amber-500 mt-0.5">선생님 계정</div>
           </button>
         </div>
-
-        {role === 'teacher' && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800 space-y-2">
-            <p className="font-semibold">⭐ 선생님 요금제</p>
-            <ul className="text-xs space-y-1 text-amber-700">
-              <li>• 첫 1개월 무료 체험</li>
-              <li>• 스튜디오/조직 생성 가능</li>
-              <li>• 수업 요청 수락 및 관리</li>
-              <li>• 체험 종료 후 구독 결제 필요</li>
-            </ul>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={agreeTrialTerm}
-                onChange={(e) => setAgreeTrialTerm(e.target.checked)}
-                className="rounded"
-              />
-              <span className="text-xs">무료 체험 약관에 동의합니다</span>
-            </label>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {(['name', 'email', 'password'] as const).map((field) => (

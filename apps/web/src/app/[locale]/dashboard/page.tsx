@@ -93,17 +93,6 @@ export default function DashboardPage({ params: { locale } }: { params: { locale
               <span className="text-xs text-amber-500">선생님 전용</span>
             </Link>
           )}
-
-          {isTeacher && (
-            <Link
-              href={`/${locale}/organizations/create`}
-              className="bg-amber-50 border border-amber-200 rounded-xl p-5 hover:shadow-md transition flex flex-col items-center gap-2 text-center"
-            >
-              <span className="text-4xl">🏢</span>
-              <span className="font-semibold text-amber-700">조직 생성</span>
-              <span className="text-xs text-amber-500">선생님 전용</span>
-            </Link>
-          )}
         </div>
       </main>
     </>

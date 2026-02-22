@@ -8,91 +8,68 @@ export class StudiosService {
   constructor(private prisma: PrismaService) {}
 
   async create(dto: CreateStudioDto, userId: string) {
+    // 직접 생성한 스튜디오 개수 확인
+    const ownedCount = await this.prisma.studio.count({ where: { createdBy: userId } });
+
+    if (ownedCount >= 1) {
+      // 2개 이상은 구독 필요
+      const user = await this.prisma.user.findUnique({ where: { id: userId } });
+      if (!user) throw new ForbiddenException('User not found');
+      if (user.role !== 'admin' && !user.isSubscribed) {
+        throw new ForbiddenException(
+          '스튜디오를 2개 이상 만들려면 구독이 필요합니다. 첫 번째 스튜디오는 무료입니다.',
+        );
+      }
+    }
+
     const studio = await this.prisma.studio.create({
-      data: {
-        name: dto.name,
-        organizationId: dto.organizationId,
-        createdBy: userId,
-      },
+      data: { name: dto.name, createdBy: userId },
     });
+
     // 생성자는 자동으로 teacher 멤버로 추가
     await (this.prisma as any).studioMembership.upsert({
       where: { studioId_userId: { studioId: studio.id, userId } },
       update: {},
       create: { studioId: studio.id, userId, role: 'teacher' },
     });
+
     return studio;
   }
 
-  findAll(userId: string, role?: string) {
-    if (role === 'teacher' || role === 'admin') {
-      // 선생님: 자신이 소유한 조직의 스튜디오 + 멤버인 스튜디오
-      return this.prisma.studio.findMany({
-        where: {
-          OR: [
-            { organization: { ownerUserId: userId } },
-            { memberships: { some: { userId } } },
-          ],
-        },
-        include: { organization: true },
-        orderBy: { createdAt: 'desc' },
-      });
-    }
-    // 학생: 멤버십이 있는 스튜디오만
+  findAll(userId: string) {
+    // 내가 만든 스튜디오 + 멤버십으로 참가한 스튜디오
     return this.prisma.studio.findMany({
-      where: { memberships: { some: { userId } } },
-      include: { organization: true },
-      orderBy: { createdAt: 'desc' },
-    });
-  }
-
-  findOrganizations(userId: string) {
-    // 소유한 조직 + 소속 스튜디오가 있는 조직 모두 반환
-    return this.prisma.organization.findMany({
       where: {
         OR: [
-          { ownerUserId: userId },
-          { studios: { some: { memberships: { some: { userId } } } } },
+          { createdBy: userId },
+          { memberships: { some: { userId } } },
         ],
       },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  async createOrganization(name: string, userId: string) {
-    // 구독 여부 확인: trialEndsAt > now 이거나 admin
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) throw new ForbiddenException('User not found');
-    if (user.role !== 'admin') {
-      const isTrialActive = user.trialEndsAt && user.trialEndsAt > new Date();
-      if (!isTrialActive) {
-        throw new ForbiddenException('조직을 생성하려면 활성 구독 또는 무료 체험이 필요합니다');
-      }
-    }
-    return this.prisma.organization.create({
-      data: { name, ownerUserId: userId },
-    });
-  }
-
   async findOne(id: string) {
     const studio = await this.prisma.studio.findUnique({
       where: { id },
-      include: { organization: true, classrooms: true },
+      include: { classrooms: true },
     });
     if (!studio) throw new NotFoundException('Studio not found');
     return studio;
   }
 
-  /** 스튜디오 초대코드 생성 (선생님/오너만) */
+  /** 스튜디오 초대코드 생성 (teacher만) */
   async createInviteCode(studioId: string, userId: string) {
     const studio = await this.prisma.studio.findUnique({ where: { id: studioId } });
     if (!studio) throw new NotFoundException('Studio not found');
+
     const membership = await (this.prisma as any).studioMembership.findUnique({
       where: { studioId_userId: { studioId, userId } },
     });
     if (!membership || membership.role !== 'teacher') {
       throw new ForbiddenException('Only studio teachers can create invite codes');
     }
+
     const code = randomBytes(4).toString('hex').toUpperCase();
     return (this.prisma as any).studioInviteCode.create({
       data: { studioId, code, createdBy: userId },
@@ -104,8 +81,10 @@ export class StudiosService {
     const invite = await (this.prisma as any).studioInviteCode.findUnique({ where: { code } });
     if (!invite) throw new NotFoundException('초대 코드를 찾을 수 없습니다');
     if (invite.isRevoked) throw new BadRequestException('만료된 초대 코드입니다');
-    if (invite.expiresAt && new Date() > invite.expiresAt) throw new BadRequestException('초대 코드가 만료되었습니다');
-    if (invite.maxUses && invite.usedCount >= invite.maxUses) throw new BadRequestException('초대 코드 사용 한도를 초과했습니다');
+    if (invite.expiresAt && new Date() > invite.expiresAt)
+      throw new BadRequestException('초대 코드가 만료되었습니다');
+    if (invite.maxUses && invite.usedCount >= invite.maxUses)
+      throw new BadRequestException('초대 코드 사용 한도를 초과했습니다');
 
     const existing = await (this.prisma as any).studioMembership.findUnique({
       where: { studioId_userId: { studioId: invite.studioId, userId } },

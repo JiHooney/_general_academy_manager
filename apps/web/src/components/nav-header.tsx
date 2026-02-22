@@ -120,13 +120,6 @@ export function NavHeader({ locale, title, showBack, backHref, role }: NavHeader
             {role === 'teacher' || role === 'admin' ? (
               <>
                 <Link
-                  href={`/${locale}/organizations/create`}
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-sm text-amber-600 font-medium"
-                >
-                  🏢 조직 생성
-                </Link>
-                <Link
                   href={`/${locale}/requests`}
                   onClick={() => setMenuOpen(false)}
                   className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-sm text-amber-600 font-medium"

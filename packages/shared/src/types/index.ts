@@ -39,17 +39,8 @@ export interface UserPublic {
   createdAt: string;
 }
 
-export interface Organization {
-  id: string;
-  name: string;
-  ownerUserId: string;
-  defaultTimezone: string;
-  createdAt: string;
-}
-
 export interface Studio {
   id: string;
-  organizationId: string;
   name: string;
   createdBy: string;
   createdAt: string;

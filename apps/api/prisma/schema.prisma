@@ -26,14 +26,12 @@ model User {
   role          UserRole @default(student)
   timezone      String   @default("UTC")
   locale        String   @default("en")
-  trialEndsAt   DateTime? @map("trial_ends_at") @db.Timestamptz
+  isSubscribed  Boolean  @default(false) @map("is_subscribed")
   country       String?  @default("KR")
   addressMain   String?  @map("address_main")
   addressDetail String?  @map("address_detail")
   postalCode    String?  @map("postal_code")
   createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
-
-  organizations           Organization[]
   createdStudios          Studio[]             @relation("StudioCreator")
   createdClassrooms       Classroom[]          @relation("ClassroomCreator")
   memberships             ClassroomMembership[]
@@ -50,31 +48,14 @@ model User {
   @@map("users")
 }
 
-// ─── Organizations ────────────────────────────────────────────────────────────
-
-model Organization {
-  id               String   @id @default(uuid())
-  name             String
-  ownerUserId      String   @map("owner_user_id")
-  defaultTimezone  String   @default("UTC") @map("default_timezone")
-  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
-
-  owner   User     @relation(fields: [ownerUserId], references: [id])
-  studios Studio[]
-
-  @@map("organizations")
-}
-
 // ─── Studios ─────────────────────────────────────────────────────────────────
 
 model Studio {
-  id             String   @id @default(uuid())
-  organizationId String   @map("organization_id")
-  name           String
-  createdBy      String   @map("created_by")
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id        String   @id @default(uuid())
+  name      String
+  createdBy String   @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
 
-  organization Organization     @relation(fields: [organizationId], references: [id])
   creator      User              @relation("StudioCreator", fields: [createdBy], references: [id])
   classrooms   Classroom[]
   memberships  StudioMembership[]

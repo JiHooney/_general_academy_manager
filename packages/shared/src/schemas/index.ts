@@ -25,7 +25,6 @@ export type LoginDto = z.infer<typeof LoginSchema>;
 
 export const CreateStudioSchema = z.object({
   name: z.string().min(1).max(100),
-  organizationId: z.string().uuid(),
 });
 export type CreateStudioDto = z.infer<typeof CreateStudioSchema>;
 
