@@ -3,6 +3,7 @@ dist/
 .next/
 .turbo/
 *.log
+logs/
 .env
 .env.local
 coverage/
@@ -10,3 +11,4 @@ coverage/
 Thumbs.db
 prisma/migrations/dev.db
 *.tsbuildinfo
+bash.exe.stackdump

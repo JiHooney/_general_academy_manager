@@ -4,6 +4,78 @@
 
 ---
 
+## 🚀 빠른 시작 (로컬 실행)
+
+### 1️⃣ 사전 준비 (최초 1회)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) 설치 및 실행
+- [fnm](https://github.com/Schniz/fnm) + Node 20, pnpm 9 설치
+
+### 2️⃣ 서비스 시작 (매번)
+
+**방법 A — 스크립트 실행 (권장)**
+
+Git Bash 터미널에서:
+```bash
+cd ~/study/_general_academic_manager
+bash start.sh
+```
+
+**방법 B — 수동 실행**
+
+터미널 1 (Docker + API):
+```bash
+cd ~/study/_general_academic_manager
+export PATH="$LOCALAPPDATA/Microsoft/WinGet/Links:$PATH"
+eval "$(fnm env --shell bash)"
+docker compose up -d
+cd apps/api && node dist/src/main.js
+```
+
+터미널 2 (Web):
+```bash
+cd ~/study/_general_academic_manager/apps/web
+export PATH="$LOCALAPPDATA/Microsoft/WinGet/Links:$PATH"
+eval "$(fnm env --shell bash)"
+rm -rf .next   # Windows 파일 잠금 방지
+pnpm dev
+```
+
+### 3️⃣ 접속
+
+| 서비스 | URL |
+|---|---|
+| 🌐 Web | http://localhost:3000 |
+| ⚙️ API | http://localhost:4000 |
+| 📚 Swagger | http://localhost:4000/docs |
+
+### 🔑 테스트 계정
+
+| 역할 | 이메일 | 비밀번호 |
+|---|---|---|
+| 선생님 | teacher@example.com | Password123! |
+| 학생 | student@example.com | Password123! |
+
+### 🔧 로그 확인
+```bash
+tail -f logs/api.log   # API 로그
+tail -f logs/web.log   # Web 로그
+```
+
+### ⚠️ Internal Server Error 발생 시
+```bash
+# Web 캐시 삭제 후 재시작
+rm -rf apps/web/.next
+# 그 후 bash start.sh 다시 실행
+```
+
+### 🔄 API 코드 변경 후
+```bash
+cd apps/api && pnpm build
+# 이후 bash start.sh 재실행
+```
+
+---
+
 ## Architecture
 
 ```
