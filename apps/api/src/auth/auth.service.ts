@@ -73,6 +73,16 @@ export class AuthService {
     return { message: 'Logged out' };
   }
 
+  async updateMe(userId: string, dto: { locale?: string; timezone?: string; name?: string }) {
+    const data: any = {};
+    if (dto.locale) data.locale = dto.locale;
+    if (dto.timezone) data.timezone = dto.timezone;
+    if (dto.name) data.name = dto.name;
+    const user = await this.prisma.user.update({ where: { id: userId }, data });
+    const { passwordHash: _, ...result } = user;
+    return result;
+  }
+
   private _issueTokens(userId: string, email: string, res: Response) {
     const payload = { sub: userId, email };
 

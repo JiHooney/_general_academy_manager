@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { api } from '../lib/api';
+import { LanguageSwitcher } from './language-switcher';
 
 interface NavHeaderProps {
   locale: string;
@@ -48,8 +49,9 @@ export function NavHeader({ locale, title, showBack, backHref, role }: NavHeader
             {title && <span className="text-gray-700 font-medium text-sm">{title}</span>}
           </div>
 
-          {/* 오른쪽: 홈 버튼 + 메뉴 */}
+          {/* 오른쪽: 언어선택 + 홈 버튼 + 메뉴 */}
           <div className="flex items-center gap-2">
+            <LanguageSwitcher currentLocale={locale} isLoggedIn={true} />
             <Link
               href={home}
               className="text-sm text-gray-600 border border-gray-300 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition"

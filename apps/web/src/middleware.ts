@@ -3,7 +3,7 @@ import { SUPPORTED_LOCALES } from '@gam/shared';
 
 export default createMiddleware({
   locales: SUPPORTED_LOCALES,
-  defaultLocale: 'en',
+  defaultLocale: 'ko',
 });
 
 export const config = {

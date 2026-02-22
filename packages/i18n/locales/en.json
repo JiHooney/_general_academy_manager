@@ -24,7 +24,18 @@
     "noAccount": "Don't have an account?",
     "haveAccount": "Already have an account?",
     "unauthorized": "Please log in to continue",
-    "forbidden": "You don't have permission to do this"
+    "forbidden": "You don't have permission to do this",
+    "roleStudent": "Student",
+    "roleTeacher": "Teacher",
+    "countryLabel": "🌍 Country",
+    "timezoneLabel": "Timezone",
+    "address": "Address",
+    "addressSearchPlaceholder": "Search by street or building name (e.g. Gangnam-daero 123)",
+    "addressDetailPlaceholder": "Address detail (apt, suite, etc.)",
+    "postalCode": "Postal Code",
+    "searching": "Searching...",
+    "signupAsStudent": "🎓 Sign up as Student",
+    "signupAsTeacher": "👨‍🏫 Sign up as Teacher"
   },
   "studio": {
     "title": "Studios",

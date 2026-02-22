@@ -24,7 +24,18 @@
     "noAccount": "계정이 없으신가요?",
     "haveAccount": "이미 계정이 있으신가요?",
     "unauthorized": "계속하려면 로그인하세요",
-    "forbidden": "권한이 없습니다"
+    "forbidden": "권한이 없습니다",
+    "roleStudent": "학생",
+    "roleTeacher": "선생님",
+    "countryLabel": "🌍 국가 / Country",
+    "timezoneLabel": "시간대",
+    "address": "주소",
+    "addressSearchPlaceholder": "도로명 또는 건물명으로 검색 (예: 강남대로 123)",
+    "addressDetailPlaceholder": "상세주소 (동/호수 등, 선택)",
+    "postalCode": "우편번호",
+    "searching": "검색 중...",
+    "signupAsStudent": "🎓 학생으로 가입하기",
+    "signupAsTeacher": "👨‍🏫 선생님으로 가입하기"
   },
   "studio": {
     "title": "스튜디오",

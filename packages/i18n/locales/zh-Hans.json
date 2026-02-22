@@ -1,6 +1,6 @@
 {
   "common": { "save": "保存", "cancel": "取消", "delete": "删除", "edit": "编辑", "loading": "加载中…", "error": "发生错误", "success": "成功", "confirm": "确认", "back": "返回", "next": "下一步", "submit": "提交", "close": "关闭" },
-  "auth": { "login": "登录", "logout": "退出", "signup": "注册", "email": "邮箱", "password": "密码", "name": "姓名", "forgotPassword": "忘记密码？", "noAccount": "还没有账号？", "haveAccount": "已有账号？", "unauthorized": "请登录后继续", "forbidden": "您没有执行此操作的权限" },
+  "auth": { "login": "登录", "logout": "退出", "signup": "注册", "email": "邮筱", "password": "密码", "name": "姓名", "forgotPassword": "忘记密码？", "noAccount": "还没有账号？", "haveAccount": "已有账号？", "unauthorized": "请登录后继续", "forbidden": "您没有执行此操作的权限", "roleStudent": "学生", "roleTeacher": "老师", "countryLabel": "🌍 国家/地区", "timezoneLabel": "时区", "address": "地址", "addressSearchPlaceholder": "搜索街道或建筑名称", "addressDetailPlaceholder": "详细地址（房间号等，选填）", "postalCode": "邮政编码", "searching": "搜索中...", "signupAsStudent": "🎓 以学生身份注册", "signupAsTeacher": "👨‍🏫 以老师身份注册" },
   "studio": { "title": "工作室", "create": "创建工作室", "name": "工作室名称", "empty": "暂无工作室" },
   "classroom": { "title": "教室", "create": "创建教室", "name": "教室名称", "description": "描述", "timezone": "时区", "empty": "暂无教室", "members": "成员", "calendar": "日历" },
   "booking": { "request": "预约课程", "startAt": "开始时间", "endAt": "结束时间", "teacher": "老师", "recommend": "推荐老师", "message": "留言（选填）", "status": { "pending": "待确认", "accepted": "已接受", "rejected": "已拒绝", "canceled": "已取消", "expired": "已过期" }, "accept": "接受", "reject": "拒绝", "cancel": "取消" },

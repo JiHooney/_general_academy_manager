@@ -162,8 +162,7 @@ export default function SignupPage({ params: { locale } }: { params: { locale: s
             }`}
           >
             <div className="text-2xl mb-1">🎓</div>
-            <div className="font-semibold text-sm">학생</div>
-            <div className="text-xs text-gray-400 mt-0.5">무료</div>
+            <div className="font-semibold text-sm">{t('roleStudent')}</div>
           </button>
           <button
             type="button"
@@ -175,8 +174,7 @@ export default function SignupPage({ params: { locale } }: { params: { locale: s
             }`}
           >
             <div className="text-2xl mb-1">👨‍🏫</div>
-            <div className="font-semibold text-sm">선생님</div>
-            <div className="text-xs text-amber-500 mt-0.5">선생님 계정</div>
+            <div className="font-semibold text-sm">{t('roleTeacher')}</div>
           </button>
         </div>
 
@@ -198,7 +196,7 @@ export default function SignupPage({ params: { locale } }: { params: { locale: s
 
           {/* ─── 국가 선택 ─────────────────────────────────── */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">🌍 국가 / Country</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">🌍 {t('countryLabel')}</label>
             <select
               value={country}
               onChange={(e) => setCountry(e.target.value)}
@@ -208,23 +206,23 @@ export default function SignupPage({ params: { locale } }: { params: { locale: s
                 <option key={c.code} value={c.code}>{c.name}</option>
               ))}
             </select>
-            <p className="text-xs text-gray-400 mt-1">시간대: {form.timezone}</p>
+            <p className="text-xs text-gray-400 mt-1">{t('timezoneLabel')}: {form.timezone}</p>
           </div>
 
           {/* ─── 한국 도로명주소 검색 ────────────────────────── */}
           {country === 'KR' && (
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">📍 주소</label>
+              <label className="block text-sm font-medium text-gray-700">📍 {t('address')}</label>
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="도로명 또는 건물명으로 검색 (예: 강남대로 123)"
+                  placeholder={t('addressSearchPlaceholder')}
                   value={jusoQuery}
                   onChange={(e) => handleJusoInput(e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
                 />
                 {jusoLoading && (
-                  <span className="absolute right-3 top-2.5 text-gray-400 text-xs">검색 중...</span>
+                  <span className="absolute right-3 top-2.5 text-gray-400 text-xs">{t('searching')}</span>
                 )}
               </div>
               {jusoResults.length > 0 && !jusoSelected && (
@@ -242,11 +240,11 @@ export default function SignupPage({ params: { locale } }: { params: { locale: s
                 </ul>
               )}
               {postalCode && (
-                <p className="text-xs text-gray-500">📮 우편번호: {postalCode}</p>
+                <p className="text-xs text-gray-500">📮 {t('postalCode')}: {postalCode}</p>
               )}
               <input
                 type="text"
-                placeholder="상세주소 (동/호수 등, 선택)"
+                placeholder={t('addressDetailPlaceholder')}
                 value={addressDetail}
                 onChange={(e) => setAddressDetail(e.target.value)}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
@@ -257,7 +255,7 @@ export default function SignupPage({ params: { locale } }: { params: { locale: s
           {/* ─── 해외 주소 폼 ────────────────────────────────── */}
           {country !== 'KR' && (
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">📍 Address (선택)</label>
+              <label className="block text-sm font-medium text-gray-700">📍 {t('address')}</label>
               <input
                 type="text"
                 placeholder="Address Line 1"
@@ -289,7 +287,7 @@ export default function SignupPage({ params: { locale } }: { params: { locale: s
             disabled={loading}
             className="w-full bg-primary-600 text-white py-2 rounded-lg hover:bg-primary-700 transition disabled:opacity-50"
           >
-            {loading ? '...' : `${role === 'teacher' ? '👨‍🏫 선생님으로 ' : '🎓 학생으로 '}가입하기`}
+            {loading ? '...' : (role === 'teacher' ? t('signupAsTeacher') : t('signupAsStudent'))}
           </button>
         </form>
 

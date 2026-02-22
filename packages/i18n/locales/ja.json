@@ -24,7 +24,18 @@
     "noAccount": "アカウントをお持ちでないですか？",
     "haveAccount": "すでにアカウントをお持ちですか？",
     "unauthorized": "続けるにはログインしてください",
-    "forbidden": "権限がありません"
+    "forbidden": "権限がありません",
+    "roleStudent": "生徒",
+    "roleTeacher": "先生",
+    "countryLabel": "🌍 国 / Country",
+    "timezoneLabel": "タイムゾーン",
+    "address": "住所",
+    "addressSearchPlaceholder": "住所を入力 (例: 江南大路 123)",
+    "addressDetailPlaceholder": "番地・部屋番号など（任意）",
+    "postalCode": "郵便番号",
+    "searching": "検索中...",
+    "signupAsStudent": "🎓 生徒として登録",
+    "signupAsTeacher": "👨‍🏫 先生として登録"
   },
   "studio": {
     "title": "スタジオ",
