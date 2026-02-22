@@ -31,11 +31,11 @@ export function LanguageSwitcher({
   const handleChange = async (locale: string) => {
     // 1. Persist to cookie (for middleware) and localStorage
     setLocaleCookie(locale);
-    try { localStorage.setItem('NEXT_LOCALE', locale); } catch (_) {}
+    try { localStorage.setItem('NEXT_LOCALE', locale); } catch (_) { /* ignore */ }
 
     // 2. Sync to server profile when logged in
     if (isLoggedIn) {
-      try { await api.patch('/auth/me', { locale }); } catch (_) {}
+      try { await api.patch('/auth/me', { locale }); } catch (_) { /* ignore */ }
     }
 
     // 3. Full-page navigation so server components reload with new messages

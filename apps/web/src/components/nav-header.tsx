@@ -25,7 +25,7 @@ export function NavHeader({ locale, title, showBack, backHref, role }: NavHeader
   const handleLogout = async () => {
     try {
       await api.post('/auth/logout', {});
-    } catch (_) {}
+    } catch (_) { /* ignore */ }
     router.push(`/${locale}/login`);
   };
 
