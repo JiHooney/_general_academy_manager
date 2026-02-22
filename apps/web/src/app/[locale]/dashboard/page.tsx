@@ -37,11 +37,9 @@ export default function DashboardPage({ params: { locale } }: { params: { locale
 
   if (!me) return null;
 
-  const isTeacher = me.role === 'teacher' || me.role === 'admin';
-
   return (
     <>
-      <NavHeader locale={locale} title={t('title')} role={me.role} />
+      <NavHeader locale={locale} title={t('title')} />
 
       <main className="max-w-2xl mx-auto p-6 space-y-6">
         {/* 인사말 */}
@@ -80,16 +78,14 @@ export default function DashboardPage({ params: { locale } }: { params: { locale
             <span className="text-xs text-gray-400">{t('joinStudioDesc')}</span>
           </Link>
 
-          {isTeacher && (
-            <Link
-              href={`/${locale}/requests`}
-              className="bg-amber-50 border border-amber-200 rounded-xl p-5 hover:shadow-md transition flex flex-col items-center gap-2 text-center"
-            >
-              <span className="text-4xl">📋</span>
-              <span className="font-semibold text-amber-700">{t('requestsTitle')}</span>
-              <span className="text-xs text-amber-500">{t('requestsDesc')}</span>
-            </Link>
-          )}
+          <Link
+            href={`/${locale}/requests`}
+            className="bg-amber-50 border border-amber-200 rounded-xl p-5 hover:shadow-md transition flex flex-col items-center gap-2 text-center"
+          >
+            <span className="text-4xl">📋</span>
+            <span className="font-semibold text-amber-700">{t('requestsTitle')}</span>
+            <span className="text-xs text-amber-500">{t('requestsDesc')}</span>
+          </Link>
         </div>
       </main>
     </>

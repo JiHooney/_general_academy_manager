@@ -218,7 +218,7 @@ export default function CalendarPage({ params: { classroomId, locale } }: Props)
 
   return (
     <>
-      <NavHeader locale={locale} title="캘린더" showBack backHref={`/${locale}/studios`} />
+      <NavHeader locale={locale} title={t('classroom.calendar')} showBack backHref={`/${locale}/studios`} />
 
       <main className="max-w-5xl mx-auto p-6 space-y-4">
       {/* Header */}

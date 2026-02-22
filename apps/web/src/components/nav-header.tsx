@@ -12,10 +12,9 @@ interface NavHeaderProps {
   title?: string;
   showBack?: boolean;
   backHref?: string;
-  role?: string;
 }
 
-export function NavHeader({ locale, title, showBack, backHref, role }: NavHeaderProps) {
+export function NavHeader({ locale, title, showBack, backHref }: NavHeaderProps) {
   const router = useRouter();
   const t = useTranslations('nav');
   const [menuOpen, setMenuOpen] = useState(false);
@@ -119,18 +118,13 @@ export function NavHeader({ locale, title, showBack, backHref, role }: NavHeader
               📅 {t('navSchedule')}
             </Link>
 
-            {/* 선생님 전용 */}
-            {role === 'teacher' || role === 'admin' ? (
-              <>
-                <Link
-                  href={`/${locale}/requests`}
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-sm text-amber-600 font-medium"
-                >
-                  📋 {t('navRequests')}
-                </Link>
-              </>
-            ) : null}
+            <Link
+              href={`/${locale}/requests`}
+              onClick={() => setMenuOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-sm text-amber-600 font-medium"
+            >
+              📋 {t('navRequests')}
+            </Link>
 
             <div className="border-t my-1" />
 

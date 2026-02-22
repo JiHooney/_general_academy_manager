@@ -1,18 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { api } from '../../../lib/api';
 import { NavHeader } from '../../../components/nav-header';
 import type { Studio } from '@gam/shared';
 
 export default function StudiosPage({ params: { locale } }: { params: { locale: string } }) {
   const t = useTranslations();
-  const router = useRouter();
-  const qc = useQueryClient();
 
   const { data: studios = [], isLoading } = useQuery({
     queryKey: ['studios'],

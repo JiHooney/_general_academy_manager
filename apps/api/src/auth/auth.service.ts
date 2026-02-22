@@ -38,7 +38,7 @@ export class AuthService {
         passwordHash,
         name: dto.name,
         timezone: dto.timezone || 'UTC',
-        locale: dto.locale || 'en',
+        locale: dto.locale || 'ko',
         role: (dto.role as any) ?? 'student',
         country: dto.country || 'KR',
         addressMain: dto.addressMain,

@@ -64,18 +64,24 @@ export class RequestsService {
         payload: { requestId: request.id },
       });
     } else {
-      // Notify all teachers in classroom
-      const teachers = await this.prisma.classroomMembership.findMany({
-        where: { classroomId, roleInClassroom: { in: ['teacher', 'admin'] }, status: 'active' },
+      // Notify all studio teachers (teacher role is studio-scoped, not classroom-scoped)
+      const classroom = await this.prisma.classroom.findUnique({
+        where: { id: classroomId },
+        select: { studioId: true },
       });
-      await Promise.all(
-        teachers.map((t) =>
-          this.notifications.create(t.userId, 'booking_request', {
-            requestId: request.id,
-            classroomId,
-          }),
-        ),
-      );
+      if (classroom) {
+        const studioTeachers = await this.prisma.studioMembership.findMany({
+          where: { studioId: classroom.studioId, role: 'teacher' },
+        });
+        await Promise.all(
+          studioTeachers.map((t) =>
+            this.notifications.create(t.userId, 'booking_request', {
+              requestId: request.id,
+              classroomId,
+            }),
+          ),
+        );
+      }
     }
 
     return request;
@@ -210,18 +216,27 @@ export class RequestsService {
     });
   }
 
-  findPendingForTeacher(teacherId: string) {
+  async findPendingForTeacher(teacherId: string) {
+    // Teacher role is studio-scoped: find all studios where user is a teacher
+    const teacherMemberships = await this.prisma.studioMembership.findMany({
+      where: { userId: teacherId, role: 'teacher' },
+      select: { studioId: true },
+    });
+    const studioIds = teacherMemberships.map((m) => m.studioId);
+
+    // Find all classrooms belonging to those studios
+    const classrooms = await this.prisma.classroom.findMany({
+      where: { studioId: { in: studioIds } },
+      select: { id: true },
+    });
+    const classroomIds = classrooms.map((c) => c.id);
+
     return this.prisma.bookingRequest.findMany({
       where: {
         status: 'pending',
         OR: [
           { requestedTeacherId: teacherId },
-          {
-            requestedTeacherId: null,
-            classroom: {
-              memberships: { some: { userId: teacherId, roleInClassroom: { in: ['teacher', 'admin'] }, status: 'active' } },
-            },
-          },
+          { requestedTeacherId: null, classroomId: { in: classroomIds } },
         ],
       },
       include: {

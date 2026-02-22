@@ -231,7 +231,7 @@ export default function MySchedulePage({ params: { locale } }: { params: { local
 
   return (
     <>
-      <NavHeader locale={locale} title="내 일정" showBack backHref={`/${locale}/dashboard`} role={me?.role} />
+      <NavHeader locale={locale} title="내 일정" showBack backHref={`/${locale}/dashboard`} />
 
       <main className="max-w-5xl mx-auto p-6 space-y-4">
         <div className="flex items-center justify-between">
