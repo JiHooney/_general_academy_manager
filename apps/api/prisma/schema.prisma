@@ -19,10 +19,10 @@ enum UserRole {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  passwordHash String   @map("password_hash")
-  name         String
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String?  @map("password_hash")
+  name          String
   role          UserRole @default(student)
   timezone      String   @default("UTC")
   locale        String   @default("en")
@@ -32,6 +32,12 @@ model User {
   addressDetail String?  @map("address_detail")
   postalCode    String?  @map("postal_code")
   createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  // ── Google OAuth ──────────────────────────────────────────────────────
+  authProvider  String   @default("google") @map("auth_provider")
+  googleSub     String?  @unique @map("google_sub")
+  pictureUrl    String?  @map("picture_url")
+  phoneE164     String?  @map("phone_e164")
   createdStudios          Studio[]             @relation("StudioCreator")
   createdClassrooms       Classroom[]          @relation("ClassroomCreator")
   memberships             ClassroomMembership[]

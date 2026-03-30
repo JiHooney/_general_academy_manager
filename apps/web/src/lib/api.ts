@@ -22,9 +22,10 @@ async function apiFetch<T>(path: string, options: FetchOptions = {}): Promise<T>
       // Retry original request
       return apiFetch<T>(path, { ...options, skipRefresh: true });
     }
-    // Redirect to login
+    // Redirect to login (locale-aware)
     if (typeof window !== 'undefined') {
-      window.location.href = '/login';
+      const locale = window.location.pathname.split('/')[1] || 'ko';
+      window.location.href = `/${locale}/login`;
     }
     throw new Error('Unauthorized');
   }

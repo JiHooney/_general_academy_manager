@@ -13,7 +13,7 @@
     "assetBundlePatterns": ["**/*"],
     "ios": { "supportsTablet": true, "bundleIdentifier": "com.gam.mobile" },
     "android": { "adaptiveIcon": { "backgroundColor": "#ffffff" }, "package": "com.gam.mobile" },
-    "plugins": ["expo-router"],
+    "plugins": ["expo-router", "expo-web-browser"],
     "experiments": { "typedRoutes": true }
   }
 }
