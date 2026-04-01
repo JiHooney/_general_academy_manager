@@ -66,14 +66,16 @@ export default function StudiosPage({ params: { locale } }: { params: { locale: 
           </div>
         ) : (
           <ul className="space-y-3">
-            {studios.map((s) => (
+            {studios.map((s: any) => (
               <li key={s.id}>
                 <Link
                   href={`/${locale}/studios/${s.id}/classrooms`}
                   className="block bg-white border rounded-xl p-4 hover:shadow-md transition"
                 >
                   <p className="font-semibold">{s.name}</p>
-                  <p className="text-sm text-gray-500">ID: {s.id}</p>
+                  {s.creator && (
+                    <p className="text-xs text-gray-400 mt-0.5">👤 {s.creator.name} ({s.creator.email})</p>
+                  )}
                 </Link>
               </li>
             ))}

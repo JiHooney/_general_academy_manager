@@ -9,6 +9,7 @@ interface Props {
   request: BookingRequest;
   classroomId: string;
   onClose: () => void;
+  viewerRole?: string;
 }
 
 function toLocalInput(iso: string) {
@@ -17,8 +18,9 @@ function toLocalInput(iso: string) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-export function RequestDetailModal({ request, classroomId, onClose }: Props) {
+export function RequestDetailModal({ request, classroomId, onClose, viewerRole }: Props) {
   const qc = useQueryClient();
+  const isTeacher = viewerRole === 'teacher';
   const [mode, setMode] = useState<'view' | 'edit' | 'confirm-delete'>('view');
   const [startAt, setStartAt] = useState(toLocalInput(request.startAt as unknown as string));
   const [endAt, setEndAt] = useState(toLocalInput(request.endAt as unknown as string));
@@ -42,6 +44,18 @@ export function RequestDetailModal({ request, classroomId, onClose }: Props) {
     mutationFn: () => api.post(`/requests/${request.id}/cancel`, {}),
     onSuccess: () => { invalidate(); onClose(); },
     onError: (e: any) => setError(e.message || '삭제에 실패했습니다.'),
+  });
+
+  const acceptMutation = useMutation({
+    mutationFn: () => api.post(`/requests/${request.id}/accept`, {}),
+    onSuccess: () => { invalidate(); onClose(); },
+    onError: (e: any) => setError(e.message || '수락에 실패했습니다.'),
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: () => api.post(`/requests/${request.id}/reject`, {}),
+    onSuccess: () => { invalidate(); onClose(); },
+    onError: (e: any) => setError(e.message || '거절에 실패했습니다.'),
   });
 
   const fmt = (iso: string) =>
@@ -86,18 +100,39 @@ export function RequestDetailModal({ request, classroomId, onClose }: Props) {
               </div>
             </div>
             <div className="flex gap-2 pt-2">
-              <button
-                onClick={() => setMode('edit')}
-                className="flex-1 bg-primary-600 text-white py-2 rounded-lg hover:bg-primary-700"
-              >
-                변경
-              </button>
-              <button
-                onClick={() => setMode('confirm-delete')}
-                className="flex-1 bg-red-500 text-white py-2 rounded-lg hover:bg-red-600"
-              >
-                삭제
-              </button>
+              {isTeacher ? (
+                <>
+                  <button
+                    onClick={() => acceptMutation.mutate()}
+                    disabled={acceptMutation.isPending || rejectMutation.isPending}
+                    className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 disabled:opacity-50"
+                  >
+                    {acceptMutation.isPending ? '...' : '✅ 수락'}
+                  </button>
+                  <button
+                    onClick={() => rejectMutation.mutate()}
+                    disabled={acceptMutation.isPending || rejectMutation.isPending}
+                    className="flex-1 bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 disabled:opacity-50"
+                  >
+                    {rejectMutation.isPending ? '...' : '❌ 거절'}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setMode('edit')}
+                    className="flex-1 bg-primary-600 text-white py-2 rounded-lg hover:bg-primary-700"
+                  >
+                    변경
+                  </button>
+                  <button
+                    onClick={() => setMode('confirm-delete')}
+                    className="flex-1 bg-red-500 text-white py-2 rounded-lg hover:bg-red-600"
+                  >
+                    삭제
+                  </button>
+                </>
+              )}
             </div>
           </>
         )}

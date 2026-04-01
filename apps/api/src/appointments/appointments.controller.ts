@@ -1,6 +1,6 @@
 import { Controller, Patch, Delete, Body, Param } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
-import { AppointmentsService, UpdateAppointmentDto } from './appointments.service';
+import { AppointmentsService, UpdateAppointmentDto, DeleteAppointmentDto } from './appointments.service';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '@prisma/client';
 
@@ -22,7 +22,11 @@ export class AppointmentsController {
 
   @Delete(':appointmentId')
   @ApiOperation({ summary: 'Cancel (soft-delete) an appointment' })
-  remove(@Param('appointmentId') appointmentId: string, @CurrentUser() user: User) {
-    return this.appointmentsService.remove(appointmentId, user.id);
+  remove(
+    @Param('appointmentId') appointmentId: string,
+    @Body() dto: DeleteAppointmentDto,
+    @CurrentUser() user: User,
+  ) {
+    return this.appointmentsService.remove(appointmentId, user.id, dto.reason);
   }
 }

@@ -43,6 +43,7 @@ export class ClassroomsService {
   findByStudio(studioId: string) {
     return this.prisma.classroom.findMany({
       where: { studioId },
+      include: { creator: { select: { id: true, name: true, email: true } } },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -56,8 +57,8 @@ export class ClassroomsService {
     return classroom;
   }
 
-  getTeachers(classroomId: string) {
-    return this.prisma.classroomMembership.findMany({
+  async getTeachers(classroomId: string) {
+    const memberships = await this.prisma.classroomMembership.findMany({
       where: {
         classroomId,
         roleInClassroom: { in: ['teacher', 'admin'] },
@@ -65,6 +66,7 @@ export class ClassroomsService {
       },
       include: { user: true },
     });
+    return memberships.map((m) => m.user);
   }
 
   async update(classroomId: string, dto: { name?: string; description?: string }, userId: string) {

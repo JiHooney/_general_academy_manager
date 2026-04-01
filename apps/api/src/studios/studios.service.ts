@@ -45,6 +45,7 @@ export class StudiosService {
           { memberships: { some: { userId } } },
         ],
       },
+      include: { creator: { select: { id: true, name: true, email: true } } },
       orderBy: { createdAt: 'desc' },
     });
   }

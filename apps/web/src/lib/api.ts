@@ -50,6 +50,6 @@ export const api = {
     apiFetch<T>(path, { method: 'POST', body: JSON.stringify(body), ...options }),
   patch: <T>(path: string, body?: unknown, options?: FetchOptions) =>
     apiFetch<T>(path, { method: 'PATCH', body: JSON.stringify(body), ...options }),
-  delete: <T>(path: string, options?: FetchOptions) =>
-    apiFetch<T>(path, { method: 'DELETE', ...options }),
+  delete: <T>(path: string, body?: unknown, options?: FetchOptions) =>
+    apiFetch<T>(path, { method: 'DELETE', body: body ? JSON.stringify(body) : undefined, ...options }),
 };

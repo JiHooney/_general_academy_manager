@@ -35,7 +35,7 @@ export class RequestsService {
   ) {}
 
   async create(classroomId: string, dto: CreateBookingRequestDto, studentId: string) {
-    const request = await (this.prisma.bookingRequest as any).create({
+    const request = await this.prisma.bookingRequest.create({
       data: {
         classroomId,
         studentId,
@@ -99,16 +99,23 @@ export class RequestsService {
   }
 
   async accept(requestId: string, teacherId: string) {
-    const req = await this.prisma.bookingRequest.findUnique({ where: { id: requestId } });
+    const req = await this.prisma.bookingRequest.findUnique({
+      where: { id: requestId },
+      select: {
+        id: true, status: true, classroomId: true, studentId: true,
+        startAt: true, endAt: true, message: true,
+        requestType: true, appointmentId: true,
+      },
+    });
     if (!req) throw new NotFoundException('Request not found');
     if (req.status !== 'pending') throw new ForbiddenException('Request is not pending');
 
     // Conflict check in transaction
     return this.prisma.$transaction(async (tx) => {
       // 취소 요청인 경우: 기존 수업만 취소
-      if ((req as any).requestType === 'cancel' && (req as any).appointmentId) {
+      if (req.requestType === 'cancel' && req.appointmentId) {
         await tx.appointment.update({
-          where: { id: (req as any).appointmentId },
+          where: { id: req.appointmentId },
           data: { status: 'canceled' },
         });
         const updatedReq = await tx.bookingRequest.update({
@@ -120,9 +127,9 @@ export class RequestsService {
       }
 
       // 수정 요청인 경우: 기존 수업 취소 + 새 수업 생성
-      if ((req as any).requestType === 'reschedule' && (req as any).appointmentId) {
+      if (req.requestType === 'reschedule' && req.appointmentId) {
         await tx.appointment.update({
-          where: { id: (req as any).appointmentId },
+          where: { id: req.appointmentId },
           data: { status: 'rescheduled' },
         });
       }

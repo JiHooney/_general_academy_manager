@@ -111,10 +111,11 @@ export class AuthService {
     return { sent: true };
   }
 
-  async findEmail(name: string): Promise<{ emails: string[] }> {
-    if (!name || name.trim().length < 1) return { emails: [] };
+  async findEmail(nameOrEmail: string): Promise<{ emails: string[] }> {
+    if (!nameOrEmail || nameOrEmail.trim().length < 1) return { emails: [] };
+    const term = nameOrEmail.trim();
     const users = await this.prisma.user.findMany({
-      where: { name: { equals: name.trim() } },
+      where: { email: { equals: term, mode: 'insensitive' } },
       select: { email: true },
     });
     const emails = users.map((u) => {

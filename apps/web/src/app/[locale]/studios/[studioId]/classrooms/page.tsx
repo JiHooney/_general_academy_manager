@@ -26,6 +26,53 @@ interface StudioMember {
 }
 interface Studio { id: string; name: string; createdBy: string; }
 
+// 스튜디오 초대코드 생성 버튼 (inlne component)
+function StudioInviteButton({ studioId }: { studioId: string }) {
+  const [code, setCode] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [show, setShow] = useState(false);
+
+  const generateMutation = useMutation({
+    mutationFn: () => api.post<{ code: string }>(`/studios/${studioId}/invites`, {}),
+    onSuccess: (data) => { setCode(data.code); setShow(true); },
+  });
+
+  const copy = () => {
+    if (code) {
+      navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <>
+      <button
+        onClick={() => generateMutation.mutate()}
+        disabled={generateMutation.isPending}
+        className="border border-green-500 text-green-600 px-4 py-2 rounded-lg hover:bg-green-50 transition text-sm font-medium disabled:opacity-50"
+      >
+        🔗 스튜디오 초대코드
+      </button>
+      {show && code && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={() => setShow(false)}>
+          <div className="bg-white rounded-2xl shadow-xl p-6 space-y-3 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-semibold">스튜디오 초대코드</h3>
+            <p className="text-xs text-gray-500">학생에게 이 코드를 공유하여 스튜디오에 초대하세요.</p>
+            <p className="font-mono text-3xl font-bold text-center text-green-700 tracking-widest bg-green-50 rounded-xl py-4">{code}</p>
+            <div className="flex gap-2">
+              <button onClick={copy} className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 text-sm">
+                {copied ? '✅ 복사됨' : '📋 코드 복사'}
+              </button>
+              <button onClick={() => setShow(false)} className="flex-1 border py-2 rounded-lg text-sm">닫기</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 interface Props {
   params: { locale: string; studioId: string };
 }
@@ -118,6 +165,9 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{t('classroom.title')}</h1>
         <div className="flex items-center gap-2">
+          {isCreator && (
+            <StudioInviteButton studioId={studioId} />
+          )}
           {isTeacher && (
           <button
             onClick={() => setShowForm(true)}
@@ -181,18 +231,24 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
               <li key={c.id} className="bg-white border rounded-xl shadow-sm overflow-hidden">
                 {editingId === c.id ? (
                   <div className="p-4 space-y-3">
-                    <input
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                      className="w-full border rounded-lg px-3 py-2 text-sm"
-                      placeholder="클래스룸 이름"
-                    />
-                    <input
-                      value={editDescription}
-                      onChange={(e) => setEditDescription(e.target.value)}
-                      className="w-full border rounded-lg px-3 py-2 text-sm"
-                      placeholder="설명 (선택)"
-                    />
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium text-gray-500">클래스명</label>
+                      <input
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="w-full border rounded-lg px-3 py-2 text-sm"
+                        placeholder="클래스명을 입력하세요"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium text-gray-500">클래스 설명</label>
+                      <input
+                        value={editDescription}
+                        onChange={(e) => setEditDescription(e.target.value)}
+                        className="w-full border rounded-lg px-3 py-2 text-sm"
+                        placeholder="클래스 설명을 입력하세요 (선택사항)"
+                      />
+                    </div>
                     <div className="flex gap-2">
                       <button
                         onClick={() => renameMutation.mutate({ id: c.id, name: editName, description: editDescription })}
@@ -217,6 +273,9 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
                     >
                       <p className="font-semibold">{c.name}</p>
                       <p className="text-sm text-gray-500">{c.description}</p>
+                      {(c as any).creator && (
+                        <p className="text-xs text-gray-400 mt-0.5">👤 {(c as any).creator.name}</p>
+                      )}
                       <p className="text-xs text-gray-400">{c.timezone}</p>
                     </Link>
                     {canManage && (

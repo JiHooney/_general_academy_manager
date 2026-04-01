@@ -15,7 +15,7 @@ export class CalendarService {
           classroomId,
           startAt: { gte: fromDate },
           endAt: { lte: toDate },
-          status: { not: 'canceled' },
+          status: 'confirmed',
         },
         include: {
           teacher: { select: { id: true, name: true, email: true } },
@@ -99,7 +99,7 @@ export class CalendarService {
           OR: [{ teacherId: userId }, { studentId: userId }],
           startAt: { gte: fromDate },
           endAt: { lte: toDate },
-          status: { not: 'canceled' },
+          status: 'confirmed',
         },
         include: {
           teacher: { select: { id: true, name: true, email: true } },

@@ -188,7 +188,7 @@ export default function LoginPage({ params: { locale } }: { params: { locale: st
         <div className="flex justify-center gap-4 text-sm text-gray-400">
           <button
             type="button"
-            onClick={() => { setFindEmailMode(!findEmailMode); setForgotPasswordMode(false); setFindResults(null); setFindName(''); }}
+            onClick={() => { setFindEmailMode(true); setForgotPasswordMode(false); setFindResults(null); setFindName(''); }}
             className="hover:text-gray-600 underline underline-offset-2 transition"
           >
             {t('findEmail')}
@@ -204,38 +204,51 @@ export default function LoginPage({ params: { locale } }: { params: { locale: st
         </div>
 
         {findEmailMode && (
-          <div className="border border-gray-200 rounded-xl p-4 space-y-3 bg-gray-50">
-            <p className="text-sm font-medium text-gray-700">{t('findEmailTitle')}</p>
-            <p className="text-xs text-gray-400">{t('findEmailDesc')}</p>
-            <form onSubmit={handleFindEmail} className="flex gap-2">
-              <input
-                type="text"
-                placeholder={t('name')}
-                value={findName}
-                onChange={(e) => { setFindName(e.target.value); setFindResults(null); }}
-                required
-                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button
-                type="submit"
-                disabled={findLoading}
-                className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition disabled:opacity-50"
-              >
-                {findLoading ? '...' : t('findEmailSubmit')}
-              </button>
-            </form>
-            {findResults !== null && (
-              findResults.length > 0 ? (
-                <div className="space-y-1">
-                  <p className="text-xs text-gray-500">{t('findEmailResult')}</p>
-                  {findResults.map((em, i) => (
-                    <p key={i} className="text-sm font-mono font-medium text-blue-700 bg-blue-50 rounded px-3 py-1.5">{em}</p>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs text-gray-500">{t('findEmailNoResult')}</p>
-              )
-            )}
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-bold">아이디(이메일) 찾기</h3>
+                <button onClick={() => { setFindEmailMode(false); setFindResults(null); setFindName(''); }}
+                  className="text-gray-400 hover:text-gray-700 text-xl">×</button>
+              </div>
+              <p className="text-xs text-gray-500">가입 시 사용한 이메일을 입력하면 계정 등록 여부를 확인해 드립니다.</p>
+              <form onSubmit={handleFindEmail} className="flex gap-2">
+                <input
+                  type="email"
+                  placeholder="이메일 입력"
+                  value={findName}
+                  onChange={(e) => { setFindName(e.target.value); setFindResults(null); }}
+                  required
+                  autoFocus
+                  className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  type="submit"
+                  disabled={findLoading}
+                  className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition disabled:opacity-50"
+                >
+                  {findLoading ? '...' : '찾기'}
+                </button>
+              </form>
+              {findResults !== null && (
+                findResults.length > 0 ? (
+                  <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center space-y-1">
+                    <p className="text-xs text-green-600">가입된 계정이 확인되었습니다.</p>
+                    <p className="text-sm font-mono font-semibold text-green-800">{findName}</p>
+                    <button
+                      onClick={() => { setEmail(findName); setFindEmailMode(false); setFindResults(null); setFindName(''); }}
+                      className="mt-2 w-full bg-blue-600 text-white py-2 rounded-lg text-sm hover:bg-blue-700 transition"
+                    >
+                      이 이메일로 로그인하기
+                    </button>
+                  </div>
+                ) : (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+                    <p className="text-sm text-red-600">등록된 계정을 찾을 수 없습니다.</p>
+                  </div>
+                )
+              )}
+            </div>
           </div>
         )}
 
