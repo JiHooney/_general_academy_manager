@@ -36,10 +36,12 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [timezone, setTimezone] = useState('UTC');
-  const [inviteCode, setInviteCode] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-
+  const [timezone, setTimezone] = useState(() =>
+    Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+  );
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editDescription, setEditDescription] = useState('');
   const { data: me } = useQuery({
     queryKey: ['me'],
     queryFn: () => api.get<Me>('/auth/me'),
@@ -60,29 +62,23 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
   const isTeacher = myMembership?.role === 'teacher' || me?.role === 'admin';
   const isCreator = studio?.createdBy === me?.id || me?.role === 'admin';
 
+  const userTimezone = me?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+
   // 사용자 timezone으로 기본값 자동 설정
   useEffect(() => {
-    if (me?.timezone) setTimezone(me.timezone);
-  }, [me?.timezone]);
+    setTimezone(userTimezone);
+  }, [userTimezone]);
 
-  const generateInviteMutation = useMutation({
-    mutationFn: () => api.post<{ code: string }>(`/studios/${studioId}/invites`, {}),
-    onSuccess: (data) => setInviteCode(data.code),
-  });
+  // 폼 열 때마다 사용자 timezone으로 초기화
+  useEffect(() => {
+    if (showForm) setTimezone(userTimezone);
+  }, [showForm]);
 
   const setRoleMutation = useMutation({
     mutationFn: ({ userId, role }: { userId: string; role: string }) =>
       api.patch(`/studios/${studioId}/members/${userId}`, { role }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['studio-members', studioId] }),
   });
-
-  const copyCode = () => {
-    if (inviteCode) {
-      navigator.clipboard.writeText(inviteCode);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
 
   const { data: classrooms = [], isLoading } = useQuery({
     queryKey: ['classrooms', studioId],
@@ -100,6 +96,20 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
     },
   });
 
+  const renameMutation = useMutation({
+    mutationFn: ({ id, name, description }: { id: string; name: string; description: string }) =>
+      api.patch(`/classrooms/${id}`, { name, description }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['classrooms', studioId] });
+      setEditingId(null);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.delete(`/classrooms/${id}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['classrooms', studioId] }),
+  });
+
   return (
     <>
       <NavHeader locale={locale} title={t('classroom.title')} showBack backHref={`/${locale}/studios`} />
@@ -109,43 +119,21 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
         <h1 className="text-2xl font-bold">{t('classroom.title')}</h1>
         <div className="flex items-center gap-2">
           {isTeacher && (
-            <button
-              onClick={() => generateInviteMutation.mutate()}
-              disabled={generateInviteMutation.isPending}
-              className="border border-amber-500 text-amber-600 px-4 py-2 rounded-lg hover:bg-amber-50 transition text-sm font-medium"
-            >
-              🔑 {t('invite.create')}
-            </button>
-          )}
           <button
             onClick={() => setShowForm(true)}
             className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition text-sm"
           >
             {t('classroom.create')}
           </button>
+          )}
         </div>
       </div>
 
-      {/* 초대코드 표시 배너 */}
-      {inviteCode && (
-        <div className="bg-amber-50 border border-amber-300 rounded-xl p-4 flex items-center justify-between gap-4">
-          <div>
-            <p className="text-xs text-amber-600 font-semibold mb-1">📨 {t('invite.code')}</p>
-            <p className="font-mono text-2xl font-bold text-amber-800 tracking-widest">{inviteCode}</p>
-          </div>
-          <button
-            onClick={copyCode}
-            className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition text-sm font-medium whitespace-nowrap"
-          >
-            {copied ? '✅' : '📋'}
-          </button>
-        </div>
-      )}
-
       {showForm && (
         <div className="bg-white border rounded-xl p-6 space-y-4 shadow-sm">
-          <h2 className="font-semibold">{t('classroom.create')}</h2>
-          <input
+          <h2 className="font-semibold">{t('classroom.create')}</h2>          <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 text-sm text-blue-700">
+            💡 클래스룸을 만든 후 클래스룸 내부에서 <strong>클래스룸 초대코드</strong>를 생성하여 학생에게 공유하세요.
+          </div>          <input
             placeholder={t('classroom.name')}
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -187,18 +175,72 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
         <p className="text-gray-500">{t('classroom.empty')}</p>
       ) : (
         <ul className="space-y-3">
-          {classrooms.map((c) => (
-            <li key={c.id}>
-              <Link
-                href={`/${locale}/classrooms/${c.id}/calendar`}
-                className="block bg-white border rounded-xl p-4 hover:shadow-md transition"
-              >
-                <p className="font-semibold">{c.name}</p>
-                <p className="text-sm text-gray-500">{c.description}</p>
-                <p className="text-xs text-gray-400">{c.timezone}</p>
-              </Link>
-            </li>
-          ))}
+          {classrooms.map((c) => {
+            const canManage = c.createdBy === me?.id || isCreator;
+            return (
+              <li key={c.id} className="bg-white border rounded-xl shadow-sm overflow-hidden">
+                {editingId === c.id ? (
+                  <div className="p-4 space-y-3">
+                    <input
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                      placeholder="클래스룸 이름"
+                    />
+                    <input
+                      value={editDescription}
+                      onChange={(e) => setEditDescription(e.target.value)}
+                      className="w-full border rounded-lg px-3 py-2 text-sm"
+                      placeholder="설명 (선택)"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => renameMutation.mutate({ id: c.id, name: editName, description: editDescription })}
+                        disabled={!editName || renameMutation.isPending}
+                        className="bg-primary-600 text-white px-3 py-1.5 rounded-lg text-xs disabled:opacity-50"
+                      >
+                        저장
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="border px-3 py-1.5 rounded-lg text-xs text-gray-600"
+                      >
+                        취소
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    <Link
+                      href={`/${locale}/classrooms/${c.id}/calendar?studioId=${studioId}`}
+                      className="flex-1 block p-4 hover:bg-gray-50 transition"
+                    >
+                      <p className="font-semibold">{c.name}</p>
+                      <p className="text-sm text-gray-500">{c.description}</p>
+                      <p className="text-xs text-gray-400">{c.timezone}</p>
+                    </Link>
+                    {canManage && (
+                      <div className="flex items-center gap-1 pr-3">
+                        <button
+                          onClick={() => { setEditingId(c.id); setEditName(c.name); setEditDescription(c.description || ''); }}
+                          className="text-xs border px-2 py-1 rounded-lg hover:bg-gray-50 text-gray-600 transition"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          onClick={() => { if (confirm(`"${c.name}" 클래스룸을 삭제할까요?`)) deleteMutation.mutate(c.id); }}
+                          disabled={deleteMutation.isPending}
+                          className="text-xs border border-red-200 px-2 py-1 rounded-lg hover:bg-red-50 text-red-600 transition disabled:opacity-50"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
 
@@ -209,7 +251,7 @@ export default function ClassroomsPage({ params: { locale, studioId } }: Props) 
           <p className="text-gray-400 text-sm">{t('common.loading')}</p>
         ) : (
           <ul className="divide-y">
-            {members.map((m) => (
+            {(isTeacher ? members : members.filter((m) => m.role === 'teacher')).map((m) => (
               <li key={m.id} className="flex items-center justify-between py-3">
                 <div>
                   <p className="font-medium text-sm text-gray-800">

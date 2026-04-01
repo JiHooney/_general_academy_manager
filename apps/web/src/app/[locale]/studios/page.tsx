@@ -15,6 +15,13 @@ export default function StudiosPage({ params: { locale } }: { params: { locale: 
     queryFn: () => api.get<Studio[]>('/studios'),
   });
 
+  const { data: me } = useQuery({
+    queryKey: ['me'],
+    queryFn: () => api.get<{ role: string }>('/auth/me'),
+  });
+
+  const isTeacher = me?.role === 'teacher';
+
   return (
     <>
       <NavHeader locale={locale} title="스튜디오 목록" showBack backHref={`/${locale}/dashboard`} />
@@ -29,12 +36,14 @@ export default function StudiosPage({ params: { locale } }: { params: { locale: 
             >
               🔑 참가
             </Link>
+            {isTeacher && (
             <Link
               href={`/${locale}/studios/create`}
               className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition text-sm"
             >
               ➕ 생성
             </Link>
+            )}
           </div>
         </div>
 
@@ -45,9 +54,11 @@ export default function StudiosPage({ params: { locale } }: { params: { locale: 
             <p className="text-lg">아직 스튜디오가 없습니다.</p>
             <p className="text-sm">스튜디오를 생성하거나 초대 코드로 참가하세요.</p>
             <div className="flex justify-center gap-3 pt-2">
+              {isTeacher && (
               <Link href={`/${locale}/studios/create`} className="bg-primary-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-primary-700 transition">
                 스튜디오 생성
               </Link>
+              )}
               <Link href={`/${locale}/studios/join`} className="border px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition">
                 초대 코드로 참가
               </Link>

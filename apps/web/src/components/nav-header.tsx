@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -18,8 +18,15 @@ export function NavHeader({ locale, title, showBack, backHref }: NavHeaderProps)
   const router = useRouter();
   const t = useTranslations('nav');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isTeacher, setIsTeacher] = useState(false);
 
   const home = `/${locale}/dashboard`;
+
+  useEffect(() => {
+    api.get<{ role: string }>('/auth/me')
+      .then((me) => setIsTeacher(me.role === 'teacher'))
+      .catch(() => {});
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -94,6 +101,7 @@ export function NavHeader({ locale, title, showBack, backHref }: NavHeaderProps)
               🏫 {t('navStudios')}
             </Link>
 
+            {isTeacher && (
             <Link
               href={`/${locale}/studios/create`}
               onClick={() => setMenuOpen(false)}
@@ -101,6 +109,7 @@ export function NavHeader({ locale, title, showBack, backHref }: NavHeaderProps)
             >
               ➕ {t('navCreateStudio')}
             </Link>
+            )}
 
             <Link
               href={`/${locale}/studios/join`}
@@ -118,6 +127,7 @@ export function NavHeader({ locale, title, showBack, backHref }: NavHeaderProps)
               📅 {t('navSchedule')}
             </Link>
 
+            {isTeacher && (
             <Link
               href={`/${locale}/requests`}
               onClick={() => setMenuOpen(false)}
@@ -125,6 +135,7 @@ export function NavHeader({ locale, title, showBack, backHref }: NavHeaderProps)
             >
               📋 {t('navRequests')}
             </Link>
+            )}
 
             <div className="border-t my-1" />
 

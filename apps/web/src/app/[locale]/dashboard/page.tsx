@@ -17,6 +17,7 @@ interface Me {
 export default function DashboardPage({ params: { locale } }: { params: { locale: string } }) {
   const router = useRouter();
   const t = useTranslations('dashboard');
+  const tAuth = useTranslations('auth');
   const [me, setMe] = useState<Me | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -45,7 +46,16 @@ export default function DashboardPage({ params: { locale } }: { params: { locale
         {/* 인사말 */}
         <div className="bg-white border rounded-xl p-6 shadow-sm">
           <p className="text-gray-500 text-sm">{t('greeting')}</p>
-          <h1 className="text-2xl font-bold text-gray-800 mt-1">{me.name}</h1>
+          <div className="flex items-center gap-2 mt-1">
+            <h1 className="text-2xl font-bold text-gray-800">{me.name}</h1>
+            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+              me.role === 'teacher'
+                ? 'bg-blue-100 text-blue-700'
+                : 'bg-green-100 text-green-700'
+            }`}>
+              {me.role === 'teacher' ? tAuth('roleTeacher') : tAuth('roleStudent')}
+            </span>
+          </div>
           <p className="text-sm text-gray-400 mt-1">{me.email}</p>
         </div>
 
@@ -60,6 +70,7 @@ export default function DashboardPage({ params: { locale } }: { params: { locale
             <span className="text-xs text-gray-400">{t('studiosDesc')}</span>
           </Link>
 
+          {me.role === 'teacher' && (
           <Link
             href={`/${locale}/studios/create`}
             className="bg-white border rounded-xl p-5 hover:shadow-md transition flex flex-col items-center gap-2 text-center"
@@ -68,6 +79,7 @@ export default function DashboardPage({ params: { locale } }: { params: { locale
             <span className="font-semibold text-gray-800">{t('createStudio')}</span>
             <span className="text-xs text-gray-400">{t('createStudioDesc')}</span>
           </Link>
+          )}
 
           <Link
             href={`/${locale}/studios/join`}
@@ -78,6 +90,7 @@ export default function DashboardPage({ params: { locale } }: { params: { locale
             <span className="text-xs text-gray-400">{t('joinStudioDesc')}</span>
           </Link>
 
+          {me.role === 'teacher' && (
           <Link
             href={`/${locale}/requests`}
             className="bg-amber-50 border border-amber-200 rounded-xl p-5 hover:shadow-md transition flex flex-col items-center gap-2 text-center"
@@ -86,6 +99,7 @@ export default function DashboardPage({ params: { locale } }: { params: { locale
             <span className="font-semibold text-amber-700">{t('requestsTitle')}</span>
             <span className="text-xs text-amber-500">{t('requestsDesc')}</span>
           </Link>
+          )}
         </div>
       </main>
     </>

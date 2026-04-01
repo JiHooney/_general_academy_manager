@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateClassroomDto } from './dto/create-classroom.dto';
 
@@ -65,5 +65,34 @@ export class ClassroomsService {
       },
       include: { user: true },
     });
+  }
+
+  async update(classroomId: string, dto: { name?: string; description?: string }, userId: string) {
+    const classroom = await this.prisma.classroom.findUnique({
+      where: { id: classroomId },
+      include: { studio: true },
+    });
+    if (!classroom) throw new NotFoundException('Classroom not found');
+
+    const canEdit = classroom.createdBy === userId || classroom.studio.createdBy === userId;
+    if (!canEdit) throw new ForbiddenException('권한이 없습니다');
+
+    return this.prisma.classroom.update({
+      where: { id: classroomId },
+      data: { ...(dto.name && { name: dto.name }), ...(dto.description !== undefined && { description: dto.description }) },
+    });
+  }
+
+  async remove(classroomId: string, userId: string) {
+    const classroom = await this.prisma.classroom.findUnique({
+      where: { id: classroomId },
+      include: { studio: true },
+    });
+    if (!classroom) throw new NotFoundException('Classroom not found');
+
+    const canDelete = classroom.createdBy === userId || classroom.studio.createdBy === userId;
+    if (!canDelete) throw new ForbiddenException('권한이 없습니다');
+
+    return this.prisma.classroom.delete({ where: { id: classroomId } });
   }
 }

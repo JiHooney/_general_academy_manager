@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { api } from '../../../../../lib/api';
@@ -169,11 +169,34 @@ export default function CalendarPage({ params: { classroomId, locale } }: Props)
   const [showBooking, setShowBooking] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<BookingRequest | null>(null);
   const [selectedAppt, setSelectedAppt] = useState<Appointment | null>(null);
+  const [classroomInviteCode, setClassroomInviteCode] = useState<string | null>(null);
+  const [classroomInviteCopied, setClassroomInviteCopied] = useState(false);
+  const [studioId, setStudioId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      setStudioId(params.get('studioId'));
+    }
+  }, []);
 
   const { data: me } = useQuery({
     queryKey: ['me'],
     queryFn: () => api.get<{ id: string; role: string }>('/auth/me'),
   });
+
+  const generateClassroomInvite = async () => {
+    const data = await api.post<{ code: string }>(`/classrooms/${classroomId}/invites`, {});
+    setClassroomInviteCode(data.code);
+  };
+
+  const copyClassroomInvite = () => {
+    if (classroomInviteCode) {
+      navigator.clipboard.writeText(classroomInviteCode);
+      setClassroomInviteCopied(true);
+      setTimeout(() => setClassroomInviteCopied(false), 2000);
+    }
+  };
 
   const from = new Date(year, month, 1).toISOString();
   const to = new Date(year, month + 1, 0, 23, 59, 59).toISOString();
@@ -218,13 +241,21 @@ export default function CalendarPage({ params: { classroomId, locale } }: Props)
 
   return (
     <>
-      <NavHeader locale={locale} title={t('classroom.calendar')} showBack backHref={`/${locale}/studios`} />
+      <NavHeader locale={locale} title={t('classroom.calendar')} showBack backHref={studioId ? `/${locale}/studios/${studioId}/classrooms` : `/${locale}/studios`} />
 
       <main className="max-w-5xl mx-auto p-6 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{t('classroom.calendar')}</h1>
         <div className="flex items-center gap-2">
+          {me?.role === 'teacher' && (
+            <button
+              onClick={generateClassroomInvite}
+              className="border border-amber-500 text-amber-600 px-4 py-2 rounded-lg hover:bg-amber-50 transition text-sm font-medium"
+            >
+              🔑 클래스룸 초대코드
+            </button>
+          )}
           {(['month', 'week', 'day'] as ViewMode[]).map((v) => (
             <button
               key={v}
@@ -238,6 +269,23 @@ export default function CalendarPage({ params: { classroomId, locale } }: Props)
           ))}
         </div>
       </div>
+
+      {/* 클래스룸 초대코드 배너 */}
+      {classroomInviteCode && (
+        <div className="bg-amber-50 border border-amber-300 rounded-xl p-4 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-xs text-amber-600 font-semibold mb-1">📨 클래스룸 초대코드</p>
+            <p className="font-mono text-2xl font-bold text-amber-800 tracking-widest">{classroomInviteCode}</p>
+            <p className="text-xs text-amber-500 mt-1">이 코드를 학생에게 공유하세요</p>
+          </div>
+          <button
+            onClick={copyClassroomInvite}
+            className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition text-sm font-medium whitespace-nowrap"
+          >
+            {classroomInviteCopied ? '✅ 복사됨' : '📋 코드 복사'}
+          </button>
+        </div>
+      )}
 
       {/* Month navigation */}
       <div className="flex items-center gap-4">
